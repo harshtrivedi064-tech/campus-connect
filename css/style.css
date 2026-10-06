@@ -1,0 +1,525 @@
+/* ---------- Theme colors (change these to restyle the whole app) ---------- */
+:root {
+    --primary: #4f46e5;
+    --primary-dark: #4338ca;
+    --bg: #f3f4f6;
+    --card: #ffffff;
+    --text: #1f2937;
+    --muted: #6b7280;
+    --border: #e5e7eb;
+    --danger: #dc2626;
+    --radius: 12px;
+    --shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Segoe UI", Roboto, Arial, sans-serif;
+}
+
+body {
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.5;
+}
+
+/* ---------- Navbar ---------- */
+.navbar {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 40px;
+    background: var(--primary);
+    color: white;
+    box-shadow: var(--shadow);
+}
+
+.logo {
+    font-size: 22px;
+    letter-spacing: 0.5px;
+}
+
+.nav-links a {
+    color: white;
+    text-decoration: none;
+    margin-left: 24px;
+    font-weight: 500;
+    padding-bottom: 3px;
+    border-bottom: 2px solid transparent;
+    transition: border-color 0.2s;
+}
+
+.nav-links a:hover {
+    border-bottom-color: white;
+}
+
+/* ---------- Home page ---------- */
+.hero {
+    text-align: center;
+    padding: 110px 20px;
+    color: white;
+    background: linear-gradient(135deg, #4f46e5, #7c3aed);
+}
+
+.hero h1 {
+    font-size: 46px;
+    margin-bottom: 12px;
+}
+
+.hero p {
+    font-size: 18px;
+    opacity: 0.9;
+}
+
+.btn {
+    display: inline-block;
+    margin-top: 28px;
+    padding: 14px 32px;
+    background: white;
+    color: var(--primary);
+    font-weight: 600;
+    text-decoration: none;
+    border-radius: 999px;
+    box-shadow: var(--shadow);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.features {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    padding: 60px 20px;
+    flex-wrap: wrap;
+}
+
+.card {
+    width: 260px;
+    padding: 28px 22px;
+    background: var(--card);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    text-align: center;
+    transition: transform 0.2s;
+}
+
+.card:hover {
+    transform: translateY(-6px);
+}
+
+.card h3 {
+    margin-bottom: 8px;
+    color: var(--primary);
+}
+
+.card p {
+    color: var(--muted);
+}
+
+footer {
+    text-align: center;
+    padding: 22px;
+    background: #111827;
+    color: #d1d5db;
+}
+
+/* ---------- Login / Signup ---------- */
+.auth-box {
+    max-width: 400px;
+    margin: 70px auto;
+    padding: 36px 30px;
+    background: var(--card);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    text-align: center;
+}
+
+.auth-box h2 {
+    margin-bottom: 24px;
+}
+
+.auth-box input {
+    display: block;
+    width: 100%;
+    padding: 12px 14px;
+    margin-bottom: 16px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 15px;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.auth-box select {
+    display: block;
+    width: 100%;
+    padding: 12px 14px;
+    margin-bottom: 16px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: white;
+    font-size: 15px;
+}
+
+.auth-box input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+}
+
+.auth-box button {
+    width: 100%;
+    padding: 12px;
+    background: var(--primary);
+    color: white;
+    font-size: 16px;
+    font-weight: 600;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.auth-box button:hover {
+    background: var(--primary-dark);
+}
+
+.switch {
+    margin-top: 18px;
+    font-size: 14px;
+    color: var(--muted);
+}
+
+.switch a {
+    color: var(--primary);
+    font-weight: 600;
+    text-decoration: none;
+}
+
+#message {
+    margin-top: 16px;
+    font-weight: 500;
+}
+
+/* ---------- Feed ---------- */
+.feed-container {
+    max-width: 640px;
+    margin: 40px auto;
+    padding: 0 20px;
+}
+
+.feed-container h2 {
+    margin-bottom: 24px;
+    text-align: center;
+}
+
+.post-box {
+    padding: 18px;
+    margin-bottom: 28px;
+    background: var(--card);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+}
+
+.post-box textarea {
+    width: 100%;
+    height: 100px;
+    padding: 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 15px;
+    resize: none;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.post-box textarea:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+}
+
+.post-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 12px;
+}
+
+#counter {
+    font-size: 13px;
+    color: var(--muted);
+}
+
+.post-actions button {
+    padding: 10px 28px;
+    background: var(--primary);
+    color: white;
+    font-weight: 600;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.post-actions button:hover {
+    background: var(--primary-dark);
+}
+
+.post {
+    padding: 18px;
+    margin-bottom: 16px;
+    background: var(--card);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+}
+
+.post-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.avatar {
+    width: 42px;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--primary);
+    color: white;
+    font-weight: 700;
+    font-size: 18px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.post-info {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.post-info strong {
+    color: var(--text);
+}
+
+.post-info small {
+    color: var(--muted);
+}
+
+.post-text {
+    margin-top: 12px;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+.delete-btn {
+    padding: 6px 14px;
+    background: transparent;
+    color: var(--danger);
+    border: 1px solid var(--danger);
+    border-radius: 6px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+}
+
+.delete-btn:hover {
+    background: var(--danger);
+    color: white;
+}
+
+.empty {
+    text-align: center;
+    color: var(--muted);
+    padding: 30px 0;
+}
+
+/* ---------- Attendance ---------- */
+.attendance-container {
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 0 20px;
+}
+
+.attendance-container > h1 {
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.attendance-card {
+    padding: 22px;
+    margin-bottom: 22px;
+    background: var(--card);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+}
+
+.attendance-card h2 {
+    margin-bottom: 18px;
+}
+
+.attendance-card form > label,
+.attendance-card legend {
+    display: block;
+    margin: 12px 0 6px;
+    font-weight: 600;
+}
+
+.attendance-card form > input {
+    width: 100%;
+    padding: 11px 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 15px;
+}
+
+.attendance-card fieldset {
+    margin: 14px 0;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px;
+}
+
+.attendance-card form > button,
+.attendance-actions button,
+.session-button {
+    border: 1px solid var(--primary);
+    border-radius: 7px;
+    padding: 9px 14px;
+    background: var(--primary);
+    color: white;
+    cursor: pointer;
+}
+
+.student-choices {
+    display: grid;
+    gap: 8px;
+}
+
+.student-choice {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    color: var(--text);
+}
+
+.student-choice input {
+    accent-color: var(--primary);
+}
+
+.session-button {
+    display: block;
+    width: 100%;
+    margin: 8px 0;
+    text-align: left;
+}
+
+.attendance-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 13px 0;
+    border-bottom: 1px solid var(--border);
+}
+
+.attendance-identity {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.attendance-identity small {
+    color: var(--muted);
+    overflow-wrap: anywhere;
+}
+
+.attendance-status {
+    min-width: 90px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.attendance-status.present {
+    color: #15803d;
+}
+
+.attendance-status.absent,
+.attendance-message.error {
+    color: var(--danger);
+}
+
+.attendance-status.unmarked {
+    color: var(--muted);
+}
+
+.attendance-actions {
+    display: flex;
+    gap: 6px;
+}
+
+.attendance-actions button {
+    padding: 7px 10px;
+    background: white;
+    color: var(--primary);
+}
+
+.attendance-actions button.selected {
+    background: var(--primary);
+    color: white;
+}
+
+.attendance-message {
+    min-height: 1.5em;
+    margin-bottom: 12px;
+    text-align: center;
+}
+
+[hidden] {
+    display: none !important;
+}
+
+/* ---------- Mobile ---------- */
+@media (max-width: 600px) {
+    .navbar {
+        padding: 12px 18px;
+    }
+
+    .logo {
+        font-size: 18px;
+    }
+
+    .nav-links a {
+        margin-left: 14px;
+    }
+
+    .hero {
+        padding: 70px 20px;
+    }
+
+    .hero h1 {
+        font-size: 32px;
+    }
+
+    .attendance-row {
+        align-items: flex-start;
+        flex-wrap: wrap;
+    }
+
+    .attendance-identity {
+        flex-basis: calc(100% - 105px);
+    }
+
+    .attendance-status {
+        min-width: auto;
+    }
+}

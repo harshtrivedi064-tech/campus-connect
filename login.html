@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - Campus Connect</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+  <nav class="navbar">
+    <h2 class="logo">Campus Connect</h2>
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="feed.html">Feed</a>
+      <a href="attendance.html">Attendance</a>
+      <a href="login.html">Login</a>
+    </div>
+  </nav>
+
+  <div class="auth-box">
+
+    <!-- Login form -->
+    <div id="loginSection">
+      <h2>Login</h2>
+      <input type="email" id="loginEmail" placeholder="Email">
+      <input type="password" id="loginPassword" placeholder="Password">
+      <button onclick="login()">Login</button>
+      <p class="switch">New user? <a href="#" onclick="showSignup()">Sign up</a></p>
+    </div>
+
+    <!-- Signup form (hidden at first) -->
+    <div id="signupSection" style="display: none;">
+      <h2>Sign up</h2>
+      <input type="text" id="signupName" placeholder="Full name">
+      <input type="email" id="signupEmail" placeholder="Email">
+      <input type="password" id="signupPassword" placeholder="Password">
+      <select id="signupRole" aria-label="Account type">
+        <option value="student">Student</option>
+        <option value="instructor">Instructor</option>
+      </select>
+      <button onclick="signup()">Create account</button>
+      <p class="switch">Already have an account? <a href="#" onclick="showLogin()">Login</a></p>
+    </div>
+
+    <p id="message"></p>
+  </div>
+
+  <script src="js/auth.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attendance - Campus Connect</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+    <nav class="navbar">
+        <h2 class="logo">Campus Connect</h2>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="feed.html">Feed</a>
+            <a href="attendance.html">Attendance</a>
+            <a href="#" onclick="logout()">Logout</a>
+        </div>
+    </nav>
+
+    <main class="attendance-container">
+        <h1>Attendance</h1>
+        <p id="attendanceMessage" class="attendance-message" role="status"></p>
+
+        <section id="instructorView" hidden>
+            <div class="attendance-card">
+                <h2>Create a class session</h2>
+                <form id="sessionForm">
+                    <label for="className">Class name</label>
+                    <input id="className" type="text" maxlength="80" required placeholder="e.g. Biology 101">
+                    <label for="classDate">Class date</label>
+                    <input id="classDate" type="date" required>
+                    <fieldset>
+                        <legend>Select registered students</legend>
+                        <div id="studentChoices" class="student-choices"></div>
+                    </fieldset>
+                    <button type="submit">Create session</button>
+                </form>
+            </div>
+
+            <div class="attendance-card">
+                <h2>Your class sessions</h2>
+                <div id="sessionList"></div>
+            </div>
+
+            <section id="rosterSection" class="attendance-card" hidden>
+                <h2 id="rosterTitle"></h2>
+                <div id="rosterList"></div>
+            </section>
+        </section>
+
+        <section id="studentView" class="attendance-card" hidden>
+            <h2>My attendance</h2>
+            <div id="myAttendance"></div>
+        </section>
+    </main>
+
+    <script src="js/attendance.js"></script>
+</body>
+
+</html>

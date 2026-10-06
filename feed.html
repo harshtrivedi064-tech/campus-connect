@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feed - Campus Connect</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+    <nav class="navbar">
+        <h2 class="logo">Campus Connect</h2>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="feed.html">Feed</a>
+            <a href="attendance.html">Attendance</a>
+            <a href="#" onclick="logout()">Logout</a>
+        </div>
+    </nav>
+
+    <div class="feed-container">
+        <h2 id="welcome"></h2>
+
+        <div class="post-box">
+            <textarea id="postText" placeholder="What's happening on campus?"></textarea>
+            <div class="post-actions">
+                <span id="counter">0 / 300</span>
+                <button onclick="addPost()">Post</button>
+            </div>
+        </div>
+
+        <div id="postList"></div>
+    </div>
+
+    <script src="js/feed.js"></script>
+</body>
+
+</html>
