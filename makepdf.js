@@ -1,0 +1,10 @@
+const fs = require('fs');
+const PDFDocument = require('pdfkit');
+const doc = new PDFDocument({ size: 'A4', margin: 50 });
+const out = fs.createWriteStream('sample.pdf');
+doc.pipe(out);
+doc.fontSize(18).text('Campus Connect is a student platform for feed, attendance, and learning.');
+doc.fontSize(14).text('Students can join events, create study groups, and review lecture notes.');
+doc.fontSize(14).text('The campus library offers digital resources, peer mentoring, and collaborative workshops for all departments.');
+doc.end();
+console.log('created');

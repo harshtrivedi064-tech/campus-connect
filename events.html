@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Campus Events</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+
+<body>
+  <nav class="navbar">
+    <h2 class="logo">Campus Connect</h2>
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="feed.html">Feed</a>
+      <a href="attendance.html">Attendance</a>
+      <a href="events.html">Events</a>
+      <a href="js/mcq.html">MCQ Maker</a>
+      <a href="#" onclick="logoutEventPage()">Logout</a>
+    </div>
+  </nav>
+
+  <main class="events-layout">
+    <section class="events-panel">
+      <div class="panel-header">
+        <h1>Campus Events</h1>
+        <p>Stay on top of activities, clubs, workshops, and campus announcements.</p>
+      </div>
+
+      <form id="eventForm" class="event-form">
+        <div class="form-grid">
+          <label>
+            Event title
+            <input id="eventTitle" type="text" maxlength="80" placeholder="Tech Fest 2026" required />
+          </label>
+          <label>
+            Date
+            <input id="eventDate" type="date" required />
+          </label>
+          <label>
+            Time
+            <input id="eventTime" type="time" required />
+          </label>
+          <label>
+            Location
+            <input id="eventLocation" type="text" maxlength="80" placeholder="Main Auditorium" required />
+          </label>
+        </div>
+
+        <label>
+          Description
+          <textarea id="eventDescription" rows="4" maxlength="280"
+            placeholder="Tell students what to expect..."></textarea>
+        </label>
+
+        <button type="submit">Add event</button>
+      </form>
+    </section>
+
+    <aside class="events-panel compact">
+      <h2>Quick overview</h2>
+      <div id="eventSummary" class="event-summary"></div>
+    </aside>
+  </main>
+
+  <section class="event-list-wrap">
+    <div class="section-title-bar">
+      <h2>Upcoming events</h2>
+    </div>
+    <div id="eventList" class="event-list"></div>
+  </section>
+
+  <script src="js/events.js"></script>
+</body>
+
+</html>

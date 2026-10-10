@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF to MCQ - Campus Connect</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+
+<body>
+
+    <nav class="navbar">
+        <h2 class="logo">Campus Connect</h2>
+        <div class="nav-links">
+            <a href="../index.html">Home</a>
+            <a href="../feed.html">Feed</a>
+            <a href="../attendance.html">Attendance</a>
+            <a href="../events.html">Events</a>
+            <a href="mcq.html">MCQ Maker</a>
+            <a href="#" onclick="logout()">Logout</a>
+        </div>
+    </nav>
+
+    <div class="mcq-container">
+        <h2>PDF to MCQ Maker</h2>
+        <p class="mcq-sub">Upload your notes as a PDF and practice with auto-generated questions.</p>
+
+        <div class="upload-box">
+            <input type="file" id="pdfFile" accept="application/pdf">
+
+            <label for="qCount">Number of questions</label>
+            <select id="qCount">
+                <option value="5">5</option>
+                <option value="10" selected>10</option>
+                <option value="15">15</option>
+                <option value="20">20</option>
+            </select>
+
+            <button id="generateBtn" onclick="generate()">Generate MCQs</button>
+            <p id="status"></p>
+        </div>
+
+        <div id="scoreBar" class="score-bar" style="display: none;"></div>
+        <div id="quiz"></div>
+    </div>
+
+    <script src="mcq.js"></script>
+</body>
+
+</html>

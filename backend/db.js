@@ -5,7 +5,7 @@ const FILE = process.env.CAMPUS_CONNECT_DATA_FILE || path.join(__dirname, 'data.
 
 function load() {
   if (!fs.existsSync(FILE)) {
-    const initialData = { users: [], posts: [], attendanceSessions: [] };
+    const initialData = { users: [], posts: [], attendanceSessions: [], events: [] };
     fs.writeFileSync(FILE, JSON.stringify(initialData, null, 2));
   }
 
@@ -13,6 +13,7 @@ function load() {
   data.users = data.users || [];
   data.posts = data.posts || [];
   data.attendanceSessions = data.attendanceSessions || [];
+  data.events = data.events || [];
   return data;
 }
 
