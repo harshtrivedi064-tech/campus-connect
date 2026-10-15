@@ -1,51 +1,232 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Campus Connect</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#080f25">
+  <title>Campus Loop | Your Campus Community</title>
   <link rel="stylesheet" href="css/style.css">
 </head>
-<body>
-  <nav class="navbar">
-    <h2 class="logo">Campus Connect</h2>
+
+<body class="home-page">
+
+  <nav class="navbar home-navbar">
+    <a href="index.html" class="home-brand">
+      <span class="brand-icon">C</span>
+      <span>Campus <span class="brand-accent">Loop</span></span>
+    </a>
+
     <div class="nav-links">
-      <a href="index.html">Home</a>
+      <a href="index.html" class="active">Home</a>
       <a href="feed.html">Feed</a>
       <a href="attendance.html">Attendance</a>
       <a href="events.html">Events</a>
-      <a href="js/mcq.html">MCQ Maker</a>
-      <a href="login.html">Login</a>
+      <a href="mcq.html">MCQ Maker</a>
+      <a href="login.html" class="nav-login">Login <span>↗</span></a>
     </div>
   </nav>
 
-  <header class="hero">
-    <h1>Campus life, organized.</h1>
-    <p>Follow announcements, take attendance, join events, and turn notes into quiz practice.</p>
-    <a class="btn" href="login.html">Get Started</a>
-  </header>
+  <main>
+    <!-- Hero section -->
+    <section class="home-hero">
+      <div class="hero-copy">
+        <div class="hero-badge">
+          <span class="status-dot"></span>
+          CONNECT · LEARN · GROW
+        </div>
 
-  <main class="features">
-    <section class="card">
-      <h3>Student Feed</h3>
-      <p>Share updates, ask questions, and stay connected with classmates.</p>
+        <h1>Your Campus.<br>
+          Your <span class="gradient-text">Community.</span>
+        </h1>
+
+        <p class="hero-description">
+          Everything happening on campus, all in one place.
+          Connect with classmates, discover events, track attendance
+          and make learning easier.
+        </p>
+
+        <div class="hero-actions">
+          <a class="home-btn primary-btn" href="events.html">
+            Explore Events <span>→</span>
+          </a>
+          <a class="home-btn secondary-btn" href="feed.html">
+            <span>♧</span> Join Community
+          </a>
+        </div>
+
+        <div class="hero-note">
+          <span class="note-icon">✦</span>
+          One campus. Endless opportunities.
+        </div>
+      </div>
+
+      <div class="hero-visual">
+        <div class="visual-glow"></div>
+
+        <div class="visual-card">
+          <div class="visual-topline">
+            <span class="visual-dot"></span>
+            CAMPUS LIFE
+            <span class="visual-live">● LIVE YOUR WAY</span>
+          </div>
+
+          <div class="campus-art" aria-label="Illustration of students learning together">
+            <div class="art-orbit orbit-one"></div>
+            <div class="art-orbit orbit-two"></div>
+            <div class="art-sun"></div>
+            <div class="art-building">
+              <div class="building-roof"></div>
+              <div class="building-windows">
+                <i></i><i></i><i></i>
+                <i></i><i></i><i></i>
+                <i></i><i></i><i></i>
+              </div>
+              <div class="building-door"></div>
+            </div>
+            <div class="art-person person-one">
+              <span class="person-head"></span>
+              <span class="person-body"></span>
+            </div>
+            <div class="art-person person-two">
+              <span class="person-head"></span>
+              <span class="person-body"></span>
+            </div>
+            <div class="art-person person-three">
+              <span class="person-head"></span>
+              <span class="person-body"></span>
+            </div>
+            <div class="art-laptop"></div>
+            <span class="art-star star-one">✦</span>
+            <span class="art-star star-two">✧</span>
+          </div>
+
+          <div class="visual-bottom">
+            <div>
+              <strong>Make campus count.</strong>
+              <p>Your student life, connected.</p>
+            </div>
+            <span class="visual-arrow">↗</span>
+          </div>
+        </div>
+
+        <a href="events.html" class="floating-chip chip-events">
+          <span class="chip-icon purple-chip">▦</span>
+          <span><strong>Campus Events</strong><small>Discover what's next</small></span>
+        </a>
+
+        <a href="feed.html" class="floating-chip chip-community">
+          <span class="chip-icon blue-chip">♧</span>
+          <span><strong>Student Community</strong><small>Connect & share</small></span>
+        </a>
+      </div>
     </section>
-    <section class="card">
-      <h3>Attendance Tracking</h3>
-      <p>Instructors can quickly mark attendance and keep each class organized.</p>
+
+    <!-- Quick access -->
+    <section class="home-section quick-section">
+      <div class="section-heading-home">
+        <div>
+          <div class="section-eyebrow"><span></span> YOUR CAMPUS TOOLKIT</div>
+          <h2>Everything you need, <span class="gradient-text">in one place.</span></h2>
+          <p>Less hassle, more campus life. Find your next step below.</p>
+        </div>
+      </div>
+
+      <div class="home-feature-grid">
+        <a href="feed.html" class="home-feature feature-purple">
+          <div class="feature-top">
+            <span class="feature-icon">♧</span>
+            <span class="feature-arrow">↗</span>
+          </div>
+          <h3>Student Feed</h3>
+          <p>Share updates, ask questions and stay in the loop with your classmates.</p>
+          <span class="feature-link">Explore feed <span>→</span></span>
+          <span class="feature-watermark">✉</span>
+        </a>
+
+        <a href="events.html" class="home-feature feature-blue">
+          <div class="feature-top">
+            <span class="feature-icon">▦</span>
+            <span class="feature-arrow">↗</span>
+          </div>
+          <h3>Campus Events</h3>
+          <p>Find workshops, competitions, seminars and activities around campus.</p>
+          <span class="feature-link">Find events <span>→</span></span>
+          <span class="feature-watermark">▦</span>
+        </a>
+
+        <a href="attendance.html" class="home-feature feature-teal">
+          <div class="feature-top">
+            <span class="feature-icon">✓</span>
+            <span class="feature-arrow">↗</span>
+          </div>
+          <h3>Attendance</h3>
+          <p>Keep track of class attendance and stay organized throughout the semester.</p>
+          <span class="feature-link">View attendance <span>→</span></span>
+          <span class="feature-watermark">✓</span>
+        </a>
+
+        <a href="mcq.html" class="home-feature feature-orange">
+          <div class="feature-top">
+            <span class="feature-icon">✳</span>
+            <span class="feature-arrow">↗</span>
+          </div>
+          <h3>MCQ Maker</h3>
+          <p>Turn your study material into practice questions and prepare smarter.</p>
+          <span class="feature-link">Start learning <span>→</span></span>
+          <span class="feature-watermark">✳</span>
+        </a>
+      </div>
     </section>
-    <section class="card">
-      <h3>Campus Events</h3>
-      <p>Discover workshops, seminars, clubs, and student activities across campus.</p>
+
+    <!-- Events promotion -->
+    <section class="home-events-banner">
+      <div class="events-banner-copy">
+        <div class="section-eyebrow"><span></span> MAKE MEMORIES ON CAMPUS</div>
+        <h2>There's always<br>something <span class="gradient-text">happening.</span></h2>
+        <p>From tech workshops to cultural celebrations, discover what's next at your campus.</p>
+        <a href="events.html" class="home-btn primary-btn">
+          View All Events <span>→</span>
+        </a>
+      </div>
+
+      <div class="event-preview-grid">
+        <a href="events.html" class="event-preview preview-one">
+          <span class="preview-symbol">⌘</span>
+          <span class="preview-label">TECH & INNOVATION</span>
+          <strong>Build something amazing.</strong>
+        </a>
+        <a href="events.html" class="event-preview preview-two">
+          <span class="preview-symbol">♫</span>
+          <span class="preview-label">CULTURE & COMMUNITY</span>
+          <strong>Make memories together.</strong>
+        </a>
+      </div>
     </section>
-    <section class="card">
-      <h3>PDF to MCQs</h3>
-      <p>Upload lecture notes and instantly generate practice questions for revision.</p>
+
+    <!-- Final call to action -->
+    <section class="home-cta">
+      <div class="cta-decoration">✦</div>
+      <div>
+        <div class="section-eyebrow">YOUR CAMPUS JOURNEY STARTS HERE</div>
+        <h2>Ready to get connected?</h2>
+        <p>Join your campus community and make every day count.</p>
+      </div>
+      <a href="login.html" class="home-btn primary-btn">
+        Get Started <span>→</span>
+      </a>
     </section>
   </main>
 
-  <footer>
-    Campus Connect • Student community platform
+  <footer class="home-footer">
+    <a href="index.html" class="home-brand">
+      <span class="brand-icon">C</span>
+      <span>Campus <span class="brand-accent">Loop</span></span>
+    </a>
+    <p>Connect. Learn. Grow.</p>
+    <span class="footer-copy">Made for campus life.</span>
   </footer>
+
 </body>
+
 </html>

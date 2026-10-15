@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF to MCQ Maker | Campus Loop</title>
+    <link rel="stylesheet" href="css/style.css">
+
+    <style>
+        .mcq-page {
+            min-height: 100vh;
+            margin: 0;
+            color: #f1f5f9;
+            background:
+                radial-gradient(ellipse at top left, #25215b 0%, transparent 42%),
+                radial-gradient(ellipse at bottom right, #172554 0%, transparent 38%),
+                #090d1b;
+            font-family: Inter, "Segoe UI", Arial, sans-serif;
+        }
+
+        .mcq-page * {
+            box-sizing: border-box;
+        }
+
+        .mcq-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 18px;
+            padding: 18px 7%;
+            border-bottom: 1px solid #ffffff15;
+            background: #0b1020cc;
+            backdrop-filter: blur(16px);
+        }
+
+        .mcq-brand {
+            font-size: 22px;
+            font-weight: 800;
+            letter-spacing: -0.6px;
+        }
+
+        .mcq-brand span {
+            color: #a78bfa;
+        }
+
+        .mcq-links {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .mcq-links a {
+            color: #aab4cc;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .mcq-links a:hover,
+        .mcq-links a.active {
+            color: #c4b5fd;
+        }
+
+        .mcq-logout {
+            padding: 9px 15px;
+            border: 1px solid #ffffff24;
+            border-radius: 10px;
+            background: #ffffff08;
+            color: white;
+            cursor: pointer;
+        }
+
+        .mcq-container {
+            width: min(1050px, 90%);
+            margin: 0 auto;
+            padding: 52px 0 70px;
+        }
+
+        .mcq-hero {
+            margin-bottom: 32px;
+        }
+
+        .mcq-tag {
+            display: inline-block;
+            padding: 7px 12px;
+            border: 1px solid #a78bfa45;
+            border-radius: 30px;
+            background: #8b5cf61b;
+            color: #c4b5fd;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .mcq-hero h1 {
+            margin: 18px 0 12px;
+            font-size: clamp(32px, 5vw, 49px);
+            line-height: 1.12;
+            letter-spacing: -1.7px;
+        }
+
+        .mcq-gradient {
+            color: #a78bfa;
+        }
+
+        .mcq-hero p {
+            max-width: 620px;
+            color: #9ba7c0;
+            font-size: 16px;
+            line-height: 1.8;
+        }
+
+        .mcq-layout {
+            display: grid;
+            grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.4fr);
+            gap: 22px;
+            align-items: start;
+        }
+
+        .mcq-panel {
+            min-width: 0;
+            padding: 25px;
+            border: 1px solid #ffffff15;
+            border-radius: 20px;
+            background: linear-gradient(145deg, #171d32eF, #101527ed);
+            box-shadow: 0 18px 55px #00000025;
+        }
+
+        .mcq-panel h2 {
+            margin: 0 0 8px;
+            font-size: 20px;
+        }
+
+        .mcq-muted {
+            margin: 0 0 23px;
+            color: #8e9ab4;
+            font-size: 13px;
+            line-height: 1.7;
+        }
+
+        .mcq-label {
+            display: block;
+            margin: 18px 0 9px;
+            color: #dbe2f1;
+            font-size: 13px;
+            font-weight: 650;
+        }
+
+        .mcq-file {
+            display: block;
+            width: 100%;
+            padding: 20px 14px;
+            border: 1px dashed #8b80c9;
+            border-radius: 13px;
+            background: #8b5cf60a;
+            color: #bfc8de;
+            font-size: 13px;
+        }
+
+        .mcq-select {
+            width: 100%;
+            padding: 13px;
+            border: 1px solid #ffffff1d;
+            border-radius: 11px;
+            outline: none;
+            background: #0c1224;
+            color: #f1f5f9;
+        }
+
+        .mcq-generate {
+            width: 100%;
+            margin-top: 23px;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            background: linear-gradient(110deg, #7c3aed, #4f46e5);
+            color: white;
+            font-size: 14px;
+            font-weight: 750;
+            cursor: pointer;
+            box-shadow: 0 8px 24px #6d28d933;
+            transition: transform .2s, opacity .2s;
+        }
+
+        .mcq-generate:hover {
+            transform: translateY(-2px);
+        }
+
+        .mcq-generate:disabled {
+            opacity: .55;
+            cursor: wait;
+            transform: none;
+        }
+
+        .mcq-status {
+            min-height: 42px;
+            margin-top: 15px;
+            color: #a5b4fc;
+            font-size: 13px;
+            line-height: 1.6;
+            overflow-wrap: anywhere;
+        }
+
+        .mcq-tip {
+            margin-top: 19px;
+            padding: 13px;
+            border: 1px solid #ffffff10;
+            border-radius: 12px;
+            background: #ffffff05;
+            color: #9ba7c0;
+            font-size: 12px;
+            line-height: 1.7;
+        }
+
+        .mcq-results-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 18px;
+        }
+
+        .mcq-results-head h2 {
+            margin: 0;
+        }
+
+        .mcq-pill {
+            padding: 6px 10px;
+            border-radius: 20px;
+            background: #8b5cf61c;
+            color: #c4b5fd;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .mcq-empty {
+            padding: 36px 12px;
+            text-align: center;
+            border: 1px dashed #ffffff20;
+            border-radius: 14px;
+        }
+
+        .mcq-empty-icon {
+            font-size: 34px;
+        }
+
+        .mcq-empty h3 {
+            margin: 12px 0 7px;
+            font-size: 16px;
+        }
+
+        .mcq-empty p {
+            margin: 0;
+            color: #8e9ab4;
+            font-size: 13px;
+            line-height: 1.7;
+        }
+
+        .mcq-q-card {
+            margin-top: 15px;
+            padding: 19px;
+            border: 1px solid #ffffff12;
+            border-radius: 14px;
+            background: #ffffff04;
+        }
+
+        .mcq-q-number {
+            color: #a78bfa;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .mcq-q-text {
+            margin: 10px 0 16px;
+            color: #f1f5f9;
+            font-size: 15px;
+            font-weight: 650;
+            line-height: 1.65;
+            overflow-wrap: anywhere;
+        }
+
+        .mcq-option {
+            display: block;
+            width: 100%;
+            margin-top: 9px;
+            padding: 12px;
+            border: 1px solid #ffffff15;
+            border-radius: 10px;
+            background: #ffffff04;
+            color: #c5cde0;
+            text-align: left;
+            font-size: 13px;
+            line-height: 1.5;
+            cursor: pointer;
+            overflow-wrap: anywhere;
+        }
+
+        .mcq-option:hover:not(:disabled) {
+            border-color: #a78bfa88;
+            background: #8b5cf615;
+        }
+
+        .mcq-option.correct {
+            border-color: #34d399;
+            background: #10b98118;
+            color: #6ee7b7;
+        }
+
+        .mcq-option.wrong {
+            border-color: #fb7185;
+            background: #f43f5e18;
+            color: #fda4af;
+        }
+
+        .mcq-option:disabled {
+            cursor: default;
+            opacity: 1;
+        }
+
+        .mcq-score {
+            display: none;
+            margin: 18px 0 0;
+            padding: 15px;
+            border: 1px solid #a78bfa35;
+            border-radius: 12px;
+            background: #8b5cf615;
+            color: #ddd6fe;
+            font-size: 14px;
+            font-weight: 700;
+            line-height: 1.7;
+        }
+
+        .mcq-footer {
+            margin-top: 35px;
+            color: #77839c;
+            font-size: 12px;
+            text-align: center;
+        }
+
+        @media (max-width: 760px) {
+            .mcq-nav {
+                padding: 16px 5%;
+                align-items: flex-start;
+            }
+
+            .mcq-links {
+                justify-content: flex-end;
+                gap: 12px;
+            }
+
+            .mcq-links a {
+                font-size: 12px;
+            }
+
+            .mcq-container {
+                width: 92%;
+                padding-top: 35px;
+            }
+
+            .mcq-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .mcq-panel {
+                padding: 20px;
+            }
+        }
+
+        @media (max-width: 450px) {
+            .mcq-nav {
+                flex-direction: column;
+            }
+
+            .mcq-links {
+                justify-content: flex-start;
+            }
+
+            .mcq-hero h1 {
+                letter-spacing: -1px;
+            }
+        }
+    </style>
+</head>
+
+<body class="mcq-page">
+    <header class="mcq-nav">
+        <div class="mcq-brand">Campus <span>Loop</span></div>
+        <nav class="mcq-links" aria-label="Main navigation">
+            <a href="index.html">Home</a>
+            <a href="feed.html">Feed</a>
+            <a href="attendance.html">Attendance</a>
+            <a href="events.html">Events</a>
+            <a href="mcq.html" class="active">MCQ Maker</a>
+            <button class="mcq-logout" onclick="logout()">Logout</button>
+        </nav>
+    </header>
+
+    <main class="mcq-container">
+        <section class="mcq-hero">
+            <span class="mcq-tag">✦ Smart Study Tool</span>
+            <h1>Turn your PDFs into<br><span class="mcq-gradient">practice questions.</span></h1>
+            <p>Upload your study notes and generate multiple-choice questions to test your understanding, one question
+                at a time.</p>
+        </section>
+
+        <section class="mcq-layout">
+            <div class="mcq-panel">
+                <h2>Create your quiz</h2>
+                <p class="mcq-muted">Choose your study material and the number of questions.</p>
+
+                <form id="mcqForm">
+                    <label class="mcq-label" for="pdfFile">Upload PDF</label>
+                    <input class="mcq-file" type="file" id="pdfFile" accept=".pdf,application/pdf" required>
+                    <p class="mcq-muted" style="margin: 9px 0 0;">PDF format · Maximum file size 10 MB</p>
+
+                    <label class="mcq-label" for="qCount">Number of questions</label>
+                    <select class="mcq-select" id="qCount">
+                        <option value="5">5 questions</option>
+                        <option value="10" selected>10 questions</option>
+                        <option value="15">15 questions</option>
+                        <option value="20">20 questions</option>
+                    </select>
+
+                    <button class="mcq-generate" id="generateBtn" type="submit">✦ Generate MCQs</button>
+                </form>
+
+                <div class="mcq-status" id="status" role="status" aria-live="polite"></div>
+
+                <div class="mcq-tip">
+                    <strong>💡 Study tip</strong><br>
+                    Try answering each question before moving on. Your score updates as you go.
+                </div>
+            </div>
+
+            <div class="mcq-panel">
+                <div class="mcq-results-head">
+                    <h2>Your quiz</h2>
+                    <span class="mcq-pill">INTERACTIVE QUIZ</span>
+                </div>
+
+                <div class="mcq-empty" id="emptyState">
+                    <div class="mcq-empty-icon">📚</div>
+                    <h3>Your questions will appear here</h3>
+                    <p>Upload a PDF, choose a question count and click Generate MCQs to begin.</p>
+                </div>
+
+                <div id="quiz"></div>
+                <div class="mcq-score" id="scoreBar" role="status" aria-live="polite"></div>
+            </div>
+        </section>
+
+        <footer class="mcq-footer">Campus Loop · Learn smarter, one question at a time.</footer>
+    </main>
+
+    <script src="js/mcq.js"></script>
+    <script>
+        document.getElementById('mcqForm').addEventListener('submit', function (event) {
+            event.preventDefault();
+            generate();
+        });
+
+        const originalRenderQuiz = renderQuiz;
+        renderQuiz = function () {
+            originalRenderQuiz();
+            document.querySelectorAll('#quiz .q-card').forEach(function (card, index) {
+                card.classList.add('mcq-q-card');
+
+                const title = card.querySelector('.q-text');
+                if (title) {
+                    title.classList.add('mcq-q-text');
+                    const text = title.textContent;
+                    const dot = text.indexOf('. ');
+                    if (dot !== -1) {
+                        const number = document.createElement('div');
+                        number.className = 'mcq-q-number';
+                        number.textContent = 'Question ' + (index + 1);
+                        title.textContent = text.slice(dot + 2);
+                        card.insertBefore(number, title);
+                    }
+                }
+
+                card.querySelectorAll('.option-btn').forEach(function (btn) {
+                    btn.classList.add('mcq-option');
+                });
+            });
+
+            const empty = document.getElementById('emptyState');
+            if (empty) empty.style.display = questions.length ? 'none' : 'block';
+        };
+    </script>
+</body>
+
+</html>

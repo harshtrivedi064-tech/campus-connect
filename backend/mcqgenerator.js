@@ -31,20 +31,32 @@ function cleanText(text) {
 }
 
 function splitSentences(text) {
-    const matches = text.match(/[^.!?]+[.!?]/g) || [];
-    return matches
-        .map(s => s.trim())
-        .filter(s => {
-            const words = s.split(' ').length;
-            const digits = (s.match(/\d/g) || []).length;
-            return (
-                s.length >= 50 && s.length <= 250 &&
-                words >= 8 && words <= 35 &&
-                /^[A-Z]/.test(s) &&
-                digits <= 6 &&
-                !/http|www\./i.test(s)
-            );
-        });
+    const fragments = text.match(/[^.!?]+[.!?]?/g) || [];
+    const sentences = [];
+
+    fragments.forEach(fragment => {
+        const words = fragment.trim().split(/\s+/);
+        if (words.length <= 35) {
+            sentences.push(fragment.trim());
+            return;
+        }
+
+        for (let i = 0; i < words.length; i += 30) {
+            const chunk = words.slice(i, i + 30).join(' ');
+            if (chunk.split(' ').length >= 8) sentences.push(chunk);
+        }
+    });
+
+    return sentences.filter(s => {
+        const words = s.split(/\s+/).length;
+        const digits = (s.match(/\d/g) || []).length;
+        return (
+            s.length >= 40 && s.length <= 300 &&
+            words >= 8 && words <= 35 &&
+            digits <= 10 &&
+            !/http|www\./i.test(s)
+        );
+    });
 }
 
 function getWords(text) {
@@ -94,8 +106,8 @@ function generateMCQs(rawText, count) {
         .sort((a, b) => freq[b] - freq[a])
         .slice(0, 100);
 
-    if (sentences.length < 3 || pool.length < 8) {
-        throw new Error('Not enough readable content to make questions. Try a PDF with more text.');
+    if (sentences.length === 0 || pool.length < 4) {
+        throw new Error('Not enough readable text with distinct terms to make questions. Try a text-based PDF with more study material.');
     }
 
     const order = shuffle(sentences.map((s, i) => ({ s, i })));
@@ -136,7 +148,7 @@ function generateMCQs(rawText, count) {
     }
 
     if (questions.length === 0) {
-        throw new Error('Could not make questions from this PDF. Try a PDF with longer text paragraphs.');
+        throw new Error('Could not make questions from this PDF. Try a text-based PDF with more varied study material.');
     }
 
     // Keep questions in the same order as the document

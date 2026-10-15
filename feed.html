@@ -1,42 +1,400 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Feed - Campus Connect</title>
+    <meta name="theme-color" content="#080f25">
+    <title>Campus Loop | Feed</title>
     <link rel="stylesheet" href="css/style.css">
+
+    <style>
+        .feed-page {
+            margin: 0;
+            min-height: 100vh;
+            color: #f5f6ff;
+            background:
+                radial-gradient(ellipse at 15% 0%, #28205a 0%, transparent 40%),
+                #080f25;
+            font-family: Arial, sans-serif;
+        }
+
+        .feed-page .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 18px;
+            padding: 20px 6%;
+            border-bottom: 1px solid #ffffff15;
+            background: #080f25dd;
+        }
+
+        .feed-brand {
+            color: white;
+            font-size: 23px;
+            font-weight: 800;
+            text-decoration: none;
+        }
+
+        .feed-brand span {
+            color: #a78bfa;
+        }
+
+        .feed-page .nav-links {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 22px;
+        }
+
+        .feed-page .nav-links a {
+            color: #c5c9dc;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color .2s;
+        }
+
+        .feed-page .nav-links a:hover,
+        .feed-page .nav-links a.active {
+            color: #b8a3ff;
+        }
+
+        .feed-container {
+            width: min(1100px, 90%);
+            margin: 45px auto;
+        }
+
+        .feed-hero {
+            padding: 35px;
+            margin-bottom: 28px;
+            border: 1px solid #ffffff18;
+            border-radius: 24px;
+            background: linear-gradient(120deg, #29245a, #151e40 65%, #172c50);
+        }
+
+        .feed-tag {
+            color: #b9a5ff;
+            font-size: 11px;
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+
+        .feed-hero h1 {
+            margin: 15px 0 10px;
+            font-size: clamp(30px, 5vw, 44px);
+        }
+
+        .feed-hero h1 span {
+            color: #b5a0ff;
+        }
+
+        .feed-hero p {
+            color: #c0c7dc;
+            line-height: 1.7;
+        }
+
+        .feed-layout {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 280px;
+            gap: 24px;
+            align-items: start;
+        }
+
+        .feed-card {
+            padding: 24px;
+            margin-bottom: 20px;
+            border: 1px solid #ffffff16;
+            border-radius: 20px;
+            background: #111a31dd;
+            box-shadow: 0 12px 35px #00000015;
+        }
+
+        .feed-card h2 {
+            margin-top: 0;
+            font-size: 19px;
+        }
+
+        .feed-muted {
+            color: #9da8c4;
+            font-size: 13px;
+            line-height: 1.7;
+        }
+
+        .feed-page textarea,
+        .feed-page input {
+            box-sizing: border-box;
+            width: 100%;
+            padding: 14px;
+            margin: 8px 0 14px;
+            color: white;
+            background: #080f25;
+            border: 1px solid #343e5c;
+            border-radius: 12px;
+            outline: none;
+            font: inherit;
+        }
+
+        .feed-page textarea {
+            min-height: 110px;
+            resize: vertical;
+        }
+
+        .feed-page textarea:focus,
+        .feed-page input:focus {
+            border-color: #9b87ff;
+        }
+
+        .feed-button {
+            padding: 12px 20px;
+            color: white;
+            background: linear-gradient(110deg, #7957ee, #4d75f5);
+            border: 0;
+            border-radius: 11px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .feed-button:hover {
+            filter: brightness(1.12);
+        }
+
+        .feed-post {
+            padding: 22px;
+            margin-bottom: 18px;
+            border: 1px solid #ffffff16;
+            border-radius: 18px;
+            background: #111a31dd;
+        }
+
+        .feed-post-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .feed-avatar {
+            display: grid;
+            place-items: center;
+            width: 43px;
+            height: 43px;
+            flex-shrink: 0;
+            border-radius: 14px;
+            color: white;
+            background: linear-gradient(135deg, #8b5cf6, #4778f5);
+            font-weight: bold;
+        }
+
+        .feed-post-header strong {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .feed-post-header small {
+            color: #98a4c1;
+        }
+
+        .feed-post-content {
+            color: #dce2f3;
+            line-height: 1.8;
+            overflow-wrap: anywhere;
+        }
+
+        .feed-post-actions {
+            display: flex;
+            gap: 12px;
+            padding-top: 15px;
+            margin-top: 15px;
+            border-top: 1px solid #ffffff12;
+        }
+
+        .feed-post-actions button {
+            padding: 9px 13px;
+            color: #c9c9ed;
+            background: #ffffff08;
+            border: 1px solid #ffffff15;
+            border-radius: 9px;
+            cursor: pointer;
+        }
+
+        .feed-post-actions button:hover {
+            background: #ffffff15;
+        }
+
+        .feed-side-item {
+            padding: 13px 0;
+            border-bottom: 1px solid #ffffff12;
+            color: #d6dcf0;
+        }
+
+        .feed-side-item:last-child {
+            border-bottom: 0;
+        }
+
+        .feed-message {
+            color: #b9a5ff;
+            font-size: 13px;
+        }
+
+        .feed-footer {
+            padding: 25px;
+            text-align: center;
+            color: #7f8ba8;
+            font-size: 13px;
+        }
+
+        @media (max-width: 760px) {
+            .feed-page .navbar {
+                padding: 18px 5%;
+            }
+
+            .feed-page .nav-links {
+                gap: 14px;
+            }
+
+            .feed-container {
+                margin: 25px auto;
+            }
+
+            .feed-hero {
+                padding: 25px;
+            }
+
+            .feed-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
 
-<body>
+<body class="feed-page">
 
     <nav class="navbar">
-        <h2 class="logo">Campus Connect</h2>
+        <a href="index.html" class="feed-brand">Campus <span>Loop</span></a>
+
         <div class="nav-links">
             <a href="index.html">Home</a>
-            <a href="feed.html">Feed</a>
+            <a href="feed.html" class="active">Feed</a>
             <a href="attendance.html">Attendance</a>
             <a href="events.html">Events</a>
-            <a href="js/mcq.html">MCQ Maker</a>
-            <a href="#" onclick="logout()">Logout</a>
+            <a href="mcq.html">MCQ Maker</a>
+            <a href="#" onclick="logout(); return false;">Logout</a>
         </div>
     </nav>
 
-    <div class="feed-container">
-        <h2 id="welcome"></h2>
+    <main class="feed-container">
 
-        <div class="post-box">
-            <textarea id="postText" placeholder="What's happening on campus?"></textarea>
-            <div class="post-actions">
-                <span id="counter">0 / 300</span>
-                <button onclick="addPost()">Post</button>
-            </div>
+        <header class="feed-hero">
+            <span class="feed-tag">YOUR CAMPUS • YOUR COMMUNITY</span>
+            <h1>Campus <span>Community</span></h1>
+            <p>Share ideas, celebrate achievements and stay connected with your campus.</p>
+        </header>
+
+        <div class="feed-layout">
+
+            <section>
+                <div class="feed-card">
+                    <h2>What's happening? ✨</h2>
+                    <p class="feed-muted">Share an update with your campus community.</p>
+
+                    <form id="quickPostForm">
+                        <textarea id="quickPostContent" placeholder="What's on your mind?" maxlength="2000"
+                            required></textarea>
+
+                        <button class="feed-button" type="submit">Share post ↗</button>
+                        <p id="quickPostMessage" class="feed-message" role="status"></p>
+                    </form>
+                </div>
+
+                <div class="feed-card">
+                    <h2>Latest updates</h2>
+                    <p class="feed-muted">
+                        Your campus posts will appear here.
+                    </p>
+                    <div id="quickFeedPosts">
+                        <p class="feed-muted">
+                            Connect this section to your existing feed system to display posts.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <aside>
+                <div class="feed-card">
+                    <h2>Campus shortcuts</h2>
+                    <div class="feed-side-item">📅 Events and activities</div>
+                    <div class="feed-side-item">📊 Attendance tracker</div>
+                    <div class="feed-side-item">📝 MCQ Maker</div>
+                </div>
+
+                <div class="feed-card">
+                    <h2>Community tip 💡</h2>
+                    <p class="feed-muted">
+                        Share useful study resources, project updates and college opportunities.
+                        Keep posts respectful and helpful.
+                    </p>
+                </div>
+            </aside>
+
         </div>
+    </main>
 
-        <div id="postList"></div>
-    </div>
+    <footer class="feed-footer">
+        © Campus Loop · Built for campus life
+    </footer>
 
-    <script src="js/feed.js"></script>
+    <script>
+        // Temporary front-end preview.
+        // Connect this form to your existing backend before using it for real posts.
+        document.getElementById('quickPostForm').addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            const input = document.getElementById('quickPostContent');
+            const message = document.getElementById('quickPostMessage');
+            const posts = document.getElementById('quickFeedPosts');
+            const content = input.value.trim();
+
+            if (!content) return;
+
+            const post = document.createElement('article');
+            post.className = 'feed-post';
+
+            const header = document.createElement('div');
+            header.className = 'feed-post-header';
+
+            const avatar = document.createElement('div');
+            avatar.className = 'feed-avatar';
+            avatar.textContent = 'Y';
+
+            const identity = document.createElement('div');
+            const name = document.createElement('strong');
+            name.textContent = 'Your post';
+
+            const time = document.createElement('small');
+            time.textContent = 'Just now';
+
+            identity.append(name, time);
+            header.append(avatar, identity);
+
+            const body = document.createElement('p');
+            body.className = 'feed-post-content';
+            body.textContent = content;
+
+            post.append(header, body);
+
+            const placeholder = posts.querySelector('.feed-muted');
+            if (placeholder) posts.replaceChildren();
+
+            posts.prepend(post);
+            input.value = '';
+            message.textContent = 'Post added to this page preview.';
+        });
+    </script>
+
+    <script src="js/auth.js"></script>
 </body>
 
 </html>
+```

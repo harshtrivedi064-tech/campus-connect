@@ -4,59 +4,119 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Attendance - Campus Connect</title>
+    <meta name="theme-color" content="#080f25">
+    <title>Attendance | Campus Loop</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
 
-<body>
-    <nav class="navbar">
-        <h2 class="logo">Campus Connect</h2>
+<body class="attendance-page">
+    <nav class="navbar attendance-navbar">
+        <a href="index.html" class="attendance-brand">
+            <span class="attendance-brand-icon">C</span>
+            Campus <span>Loop</span>
+        </a>
+
         <div class="nav-links">
             <a href="index.html">Home</a>
             <a href="feed.html">Feed</a>
-            <a href="attendance.html">Attendance</a>
+            <a href="attendance.html" class="attendance-active">Attendance</a>
             <a href="events.html">Events</a>
-            <a href="js/mcq.html">MCQ Maker</a>
-            <a href="#" onclick="logout()">Logout</a>
+            <a href="mcq.html">MCQ Maker</a>
+            <a href="#" onclick="logout(); return false;">Logout</a>
         </div>
     </nav>
 
     <main class="attendance-container">
-        <h1>Attendance</h1>
-        <p id="attendanceMessage" class="attendance-message" role="status"></p>
+        <header class="attendance-hero">
+            <div>
+                <span class="attendance-eyebrow">CAMPUS LOOP • STUDENT TOOLS</span>
+                <h1>Attendance <span>Dashboard</span></h1>
+                <p>Track your classes, stay consistent and keep your attendance on target.</p>
+            </div>
+            <div class="attendance-hero-icon" aria-hidden="true">▦</div>
+        </header>
+
+        <p id="attendanceMessage" class="attendance-message" role="status" aria-live="polite"></p>
 
         <section id="instructorView" hidden>
             <div class="attendance-card">
-                <h2>Create a class session</h2>
-                <form id="sessionForm">
-                    <label for="className">Class name</label>
-                    <input id="className" type="text" maxlength="80" required placeholder="e.g. Biology 101">
+                <div class="attendance-section-heading">
+                    <div>
+                        <span class="attendance-eyebrow">INSTRUCTOR PANEL</span>
+                        <h2>Create a class session</h2>
+                    </div>
+                    <span class="attendance-heading-icon">＋</span>
+                </div>
+
+                <form id="sessionForm" class="attendance-form">
+                    <label for="className">Class / Subject name</label>
+                    <input id="className" type="text" maxlength="80" required placeholder="e.g. Mathematics">
+
                     <label for="classDate">Class date</label>
                     <input id="classDate" type="date" required>
+
                     <fieldset>
                         <legend>Select registered students</legend>
                         <div id="studentChoices" class="student-choices"></div>
                     </fieldset>
-                    <button type="submit">Create session</button>
+
+                    <button type="submit" class="attendance-primary-button">
+                        Create session <span>→</span>
+                    </button>
                 </form>
             </div>
 
             <div class="attendance-card">
-                <h2>Your class sessions</h2>
+                <div class="attendance-section-heading">
+                    <div>
+                        <span class="attendance-eyebrow">CLASS MANAGEMENT</span>
+                        <h2>Your class sessions</h2>
+                    </div>
+                </div>
                 <div id="sessionList"></div>
             </div>
 
             <section id="rosterSection" class="attendance-card" hidden>
-                <h2 id="rosterTitle"></h2>
+                <div class="attendance-section-heading">
+                    <div>
+                        <span class="attendance-eyebrow">RECORD ATTENDANCE</span>
+                        <h2 id="rosterTitle">Class roster</h2>
+                    </div>
+                </div>
                 <div id="rosterList"></div>
             </section>
         </section>
 
-        <section id="studentView" class="attendance-card" hidden>
-            <h2>My attendance</h2>
-            <div id="myAttendance"></div>
+        <section id="studentView" hidden>
+            <div id="attendanceSummary" class="attendance-stats"></div>
+
+            <div class="attendance-card attendance-alert-card">
+                <div class="attendance-section-heading">
+                    <div>
+                        <span class="attendance-eyebrow">SMART REMINDERS</span>
+                        <h2>Attendance alerts</h2>
+                    </div>
+                    <span class="attendance-heading-icon">♧</span>
+                </div>
+                <div id="attendanceAlerts"></div>
+            </div>
+
+            <div class="attendance-card">
+                <div class="attendance-section-heading">
+                    <div>
+                        <span class="attendance-eyebrow">SUBJECT PERFORMANCE</span>
+                        <h2>My attendance</h2>
+                    </div>
+                </div>
+                <div id="myAttendance"></div>
+            </div>
         </section>
     </main>
+
+    <footer class="attendance-footer">
+        <span>© Campus Loop</span>
+        <span>Stay consistent. Stay on track.</span>
+    </footer>
 
     <script src="js/attendance.js"></script>
 </body>

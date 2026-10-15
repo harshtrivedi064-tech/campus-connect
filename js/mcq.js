@@ -1,4 +1,6 @@
-const API = 'http://localhost:3000';
+const API = /^(localhost|127\.0\.0\.1)$/.test(window.location.hostname)
+    ? 'http://localhost:3000'
+    : '';
 
 // If the user is not logged in, send them to the login page
 const token = localStorage.getItem('token');
@@ -43,9 +45,12 @@ async function generate() {
     form.append('pdf', file);
 
     button.disabled = true;
-    setStatus('Reading your PDF and creating questions...', '#6b7280');
+    button.textContent = 'Generating questions...';
+    setStatus('Uploading PDF, then creating your questions...', '#6b7280');
     document.getElementById('quiz').innerHTML = '';
     document.getElementById('scoreBar').style.display = 'none';
+    const emptyState = document.getElementById('emptyState');
+    if (emptyState) emptyState.style.display = 'block';
 
     try {
         const res = await fetch(API + '/mcq', {
@@ -59,10 +64,15 @@ async function generate() {
             return;
         }
 
-        const data = await res.json();
+        const data = await res.json().catch(() => ({}));
 
         if (!res.ok) {
-            setStatus(data.error || 'Something went wrong.', 'red');
+            setStatus(data.error || 'The server could not process this PDF. Please try another file.', 'red');
+            return;
+        }
+
+        if (!Array.isArray(data.questions) || data.questions.length === 0) {
+            setStatus('The server did not return any questions. Try a text-based PDF with readable content.', 'red');
             return;
         }
 
@@ -80,9 +90,10 @@ async function generate() {
         updateScore();
     } catch (err) {
         console.error(err);
-        setStatus('Cannot reach the server. Is the backend running?', 'red');
+        setStatus('Cannot reach the MCQ server. Check that the backend is running, then try again.', 'red');
     } finally {
         button.disabled = false;
+        button.textContent = '✦ Generate MCQs';
     }
 }
 

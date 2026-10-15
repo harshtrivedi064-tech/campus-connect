@@ -4,51 +4,145 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login - Campus Connect</title>
+  <meta name="theme-color" content="#080f25">
+  <title>Login | Campus Loop</title>
   <link rel="stylesheet" href="css/style.css">
 </head>
 
-<body>
+<body class="auth-page">
 
-  <nav class="navbar">
-    <h2 class="logo">Campus Connect</h2>
+  <nav class="navbar auth-navbar">
+    <a href="index.html" class="auth-brand">
+      <span class="auth-brand-icon">C</span>
+      <span>Campus <span class="auth-gradient-text">Loop</span></span>
+    </a>
+
     <div class="nav-links">
       <a href="index.html">Home</a>
       <a href="feed.html">Feed</a>
       <a href="attendance.html">Attendance</a>
       <a href="events.html">Events</a>
-      <a href="js/mcq.html">MCQ Maker</a>
-      <a href="login.html">Login</a>
+      <a href="mcq.html">MCQ Maker</a>
+      <a href="login.html" class="auth-nav-active">Login</a>
     </div>
   </nav>
 
-  <div class="auth-box">
+  <main class="auth-main">
+    <section class="auth-welcome">
+      <div class="auth-pill">
+        <span class="auth-status-dot"></span>
+        YOUR CAMPUS COMMUNITY
+      </div>
 
-    <!-- Login form -->
-    <div id="loginSection">
-      <h2>Login</h2>
-      <input type="email" id="loginEmail" placeholder="Email">
-      <input type="password" id="loginPassword" placeholder="Password">
-      <button onclick="login()">Login</button>
-      <p class="switch">New user? <a href="#" onclick="showSignup()">Sign up</a></p>
-    </div>
+      <h1>Your people.<br>Your place.<br><span class="auth-gradient-text">Your campus.</span></h1>
 
-    <!-- Signup form (hidden at first) -->
-    <div id="signupSection" style="display: none;">
-      <h2>Sign up</h2>
-      <input type="text" id="signupName" placeholder="Full name">
-      <input type="email" id="signupEmail" placeholder="Email">
-      <input type="password" id="signupPassword" placeholder="Password">
-      <select id="signupRole" aria-label="Account type">
-        <option value="student">Student</option>
-        <option value="instructor">Instructor</option>
-      </select>
-      <button onclick="signup()">Create account</button>
-      <p class="switch">Already have an account? <a href="#" onclick="showLogin()">Login</a></p>
-    </div>
+      <p class="auth-welcome-text">
+        One account brings your campus closer.
+        Connect with classmates, discover events and
+        make your college journey count.
+      </p>
 
-    <p id="message"></p>
-  </div>
+      <div class="auth-benefits">
+        <div class="auth-benefit">
+          <span class="auth-benefit-icon purple">✦</span>
+          <div>
+            <strong>Stay connected</strong>
+            <p>Keep up with your campus community.</p>
+          </div>
+        </div>
+
+        <div class="auth-benefit">
+          <span class="auth-benefit-icon blue">▦</span>
+          <div>
+            <strong>Never miss an event</strong>
+            <p>Discover what's happening around you.</p>
+          </div>
+        </div>
+
+        <div class="auth-benefit">
+          <span class="auth-benefit-icon teal">✓</span>
+          <div>
+            <strong>Make learning easier</strong>
+            <p>Organize attendance and practice smarter.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="auth-box">
+      <div class="auth-card-glow"></div>
+
+      <div class="auth-card-content">
+        <div class="auth-card-mark">C</div>
+
+        <!-- Login form -->
+        <div id="loginSection">
+          <p class="auth-eyebrow">WELCOME BACK</p>
+          <h2>Login to your account</h2>
+          <p class="auth-subtitle">Pick up where your campus journey left off.</p>
+
+          <label class="auth-label" for="loginEmail">Email address</label>
+          <input type="email" id="loginEmail" placeholder="you@example.com" autocomplete="email" required>
+
+          <label class="auth-label" for="loginPassword">Password</label>
+          <input type="password" id="loginPassword" placeholder="Enter your password" autocomplete="current-password"
+            required>
+
+          <button type="button" class="auth-submit" onclick="login()">
+            Login <span>→</span>
+          </button>
+
+          <p class="switch auth-switch">
+            New to Campus Loop?
+            <a href="#signup" onclick="showSignup(); return false;">Create an account</a>
+          </p>
+        </div>
+
+        <!-- Signup form -->
+        <div id="signupSection" style="display: none;">
+          <p class="auth-eyebrow">JOIN THE COMMUNITY</p>
+          <h2>Create your account</h2>
+          <p class="auth-subtitle">Get connected to your campus in minutes.</p>
+
+          <label class="auth-label" for="signupName">Full name</label>
+          <input type="text" id="signupName" placeholder="Enter your full name" autocomplete="name" required>
+
+          <label class="auth-label" for="signupEmail">Email address</label>
+          <input type="email" id="signupEmail" placeholder="you@example.com" autocomplete="email" required>
+
+          <label class="auth-label" for="signupPassword">Password</label>
+          <input type="password" id="signupPassword" placeholder="Create a password" autocomplete="new-password"
+            required>
+
+          <label class="auth-label" for="signupRole">Account type</label>
+          <select id="signupRole" aria-label="Account type">
+            <option value="student">Student</option>
+            <option value="instructor">Instructor</option>
+          </select>
+
+          <button type="button" class="auth-submit" onclick="signup()">
+            Create account <span>→</span>
+          </button>
+
+          <p class="switch auth-switch">
+            Already registered?
+            <a href="#login" onclick="showLogin(); return false;">Login instead</a>
+          </p>
+        </div>
+
+        <p id="message" class="auth-message" role="status" aria-live="polite"></p>
+
+        <div class="auth-card-footer">
+          <span>✦</span> CONNECT. LEARN. GROW.
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="auth-footer">
+    <span>© Campus Loop</span>
+    <span>Made for campus life.</span>
+  </footer>
 
   <script src="js/auth.js"></script>
 </body>

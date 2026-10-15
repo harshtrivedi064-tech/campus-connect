@@ -2,75 +2,94 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Campus Events</title>
-  <link rel="stylesheet" href="css/style.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#101827">
+  <title>Campus Loop | Events</title>
+  <link rel="stylesheet" href="css/style.css">
 </head>
 
-<body>
+<body class="events-page">
   <nav class="navbar">
-    <h2 class="logo">Campus Connect</h2>
+    <h2 class="logo">Campus Loop</h2>
     <div class="nav-links">
       <a href="index.html">Home</a>
       <a href="feed.html">Feed</a>
       <a href="attendance.html">Attendance</a>
-      <a href="events.html">Events</a>
-      <a href="js/mcq.html">MCQ Maker</a>
-      <a href="#" onclick="logoutEventPage()">Logout</a>
+      <a href="events.html" aria-current="page">Events</a>
+      <a href="mcq.html">MCQ Maker</a>
+      <a href="#" id="logoutLink">Logout</a>
     </div>
   </nav>
 
-  <main class="events-layout">
-    <section class="events-panel">
-      <div class="panel-header">
-        <h1>Campus Events</h1>
-        <p>Stay on top of activities, clubs, workshops, and campus announcements.</p>
+  <main class="events-main">
+    <header class="events-hero">
+      <p class="eyebrow">YOUR CAMPUS. YOUR COMMUNITY.</p>
+      <h1>Discover what's <span>happening.</span></h1>
+      <p>Find workshops, competitions, festivals and opportunities to connect.</p>
+      <div class="event-summary" id="eventSummary"></div>
+    </header>
+
+    <section class="admin-event-panel" id="adminPanel" hidden>
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">ADMIN WORKSPACE</p>
+          <h2>Create a campus event</h2>
+          <p>Add the details and a photo for students to discover.</p>
+        </div>
       </div>
 
       <form id="eventForm" class="event-form">
         <div class="form-grid">
           <label>
-            Event title
-            <input id="eventTitle" type="text" maxlength="80" placeholder="Tech Fest 2026" required />
+            Event title *
+            <input id="eventTitle" name="title" type="text" maxlength="80" placeholder="e.g. Annual Tech Fest" required>
           </label>
           <label>
-            Date
-            <input id="eventDate" type="date" required />
+            Date *
+            <input id="eventDate" name="date" type="date" required>
           </label>
           <label>
-            Time
-            <input id="eventTime" type="time" required />
+            Time *
+            <input id="eventTime" name="time" type="time" required>
           </label>
           <label>
-            Location
-            <input id="eventLocation" type="text" maxlength="80" placeholder="Main Auditorium" required />
+            Venue *
+            <input id="eventLocation" name="location" type="text" maxlength="80" placeholder="Main Auditorium" required>
           </label>
         </div>
 
         <label>
-          Description
-          <textarea id="eventDescription" rows="4" maxlength="280"
-            placeholder="Tell students what to expect..."></textarea>
+          Event description
+          <textarea id="eventDescription" name="description" rows="3" maxlength="280"
+            placeholder="What should students know?"></textarea>
         </label>
 
-        <button type="submit">Add event</button>
+        <label>
+          Event photo (JPG, PNG, WEBP or GIF; max 5 MB)
+          <input id="eventPhoto" name="photo" type="file" accept="image/jpeg,image/png,image/webp,image/gif">
+        </label>
+
+        <button type="submit" id="addEventButton">Publish event</button>
+        <p id="formMessage" class="form-message" role="status"></p>
       </form>
     </section>
 
-    <aside class="events-panel compact">
-      <h2>Quick overview</h2>
-      <div id="eventSummary" class="event-summary"></div>
-    </aside>
+    <section class="upcoming-section">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">MARK YOUR CALENDAR</p>
+          <h2>Upcoming events</h2>
+        </div>
+        <span class="section-note">Made for campus life</span>
+      </div>
+      <div id="eventList" class="event-list" aria-live="polite">
+        <p class="muted">Loading events...</p>
+      </div>
+    </section>
   </main>
 
-  <section class="event-list-wrap">
-    <div class="section-title-bar">
-      <h2>Upcoming events</h2>
-    </div>
-    <div id="eventList" class="event-list"></div>
-  </section>
-
+  <footer class="events-footer">Campus Loop · Connect. Discover. Participate.</footer>
   <script src="js/events.js"></script>
 </body>
 
