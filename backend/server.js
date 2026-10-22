@@ -24,16 +24,17 @@ try {
   console.error('    Fix: inside the backend folder run: npm install multer pdf-parse@1.1.1\n');
 }
 
-// ---------- CORS: allow the frontend running on localhost ----------
-app.use(cors({
-  origin: function (origin, callback) {
-    // Allow Live Server on localhost / 127.0.0.1 (any port) and tools without an origin
-    if (!origin || /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin)) {
-      return callback(null, true);
+// Production serves the frontend and API from one origin; local development may use Live Server.
+if (process.env.NODE_ENV !== 'production') {
+  app.use(cors({
+    origin: function (origin, callback) {
+      if (!origin || /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin)) {
+        return callback(null, true);
+      }
+      callback(new Error('Not allowed by CORS'));
     }
-    callback(new Error('Not allowed by CORS'));
-  }
-}));
+  }));
+}
 
 // ---------- Basic security headers ----------
 app.disable('x-powered-by');

@@ -1,4 +1,6 @@
-const API = 'http://localhost:3000';
+const API = /^(localhost|127\.0\.0\.1)$/.test(window.location.hostname)
+    ? 'http://localhost:3000'
+    : '';
 
 // If the user is not logged in, send them to the login page
 const token = localStorage.getItem('token');

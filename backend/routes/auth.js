@@ -4,7 +4,12 @@ const jwt = require('jsonwebtoken');
 const db = require('../db');
 
 const router = express.Router();
-const SECRET = 'change-this-secret-before-deploying';
+const SECRET = process.env.JWT_SECRET ||
+  (process.env.NODE_ENV === 'production' ? '' : 'campus-loop-local-development-only');
+
+if (!SECRET) {
+  throw new Error('JWT_SECRET must be configured in production.');
+}
 
 router.post('/signup', async (req, res) => {
   const { name, email, password, role } = req.body || {};

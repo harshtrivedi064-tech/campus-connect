@@ -1,5 +1,7 @@
 
-const API = 'http://localhost:3000';
+const API = /^(localhost|127\.0\.0\.1)$/.test(window.location.hostname)
+  ? 'http://localhost:3000'
+  : '';
 const token = localStorage.getItem('token');
 
 let currentUser = null;

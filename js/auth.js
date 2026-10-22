@@ -1,4 +1,6 @@
-const API = 'http://localhost:3000';
+const API = /^(localhost|127\.0\.0\.1)$/.test(window.location.hostname)
+    ? 'http://localhost:3000'
+    : '';
 
 function showSignup() {
     document.getElementById('loginSection').style.display = 'none';

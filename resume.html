@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resume Builder | Campus Loop</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f1f5f9;
+            color: #1e293b;
+        }
+
+        header {
+            background: #172554;
+            color: white;
+            padding: 18px 6%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        header a {
+            color: white;
+            text-decoration: none;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 28px auto;
+            padding: 0 18px;
+        }
+
+        h1 {
+            margin-bottom: 8px;
+        }
+
+        .intro {
+            color: #64748b;
+            margin-bottom: 25px;
+        }
+
+        .layout {
+            display: grid;
+            grid-template-columns: minmax(280px, 1fr) minmax(300px, 1fr);
+            gap: 24px;
+            align-items: start;
+        }
+
+        .panel {
+            background: white;
+            padding: 22px;
+            border-radius: 14px;
+            box-shadow: 0 4px 18px #0f172a0d;
+        }
+
+        label {
+            display: block;
+            margin: 14px 0 6px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        input,
+        textarea {
+            width: 100%;
+            padding: 11px;
+            border: 1px solid #cbd5e1;
+            border-radius: 7px;
+            font: inherit;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 75px;
+        }
+
+        button {
+            border: 0;
+            border-radius: 8px;
+            padding: 12px 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 8px 5px 0 0;
+        }
+
+        .primary {
+            background: #2563eb;
+            color: white;
+        }
+
+        .secondary {
+            background: #e2e8f0;
+            color: #0f172a;
+        }
+
+        #resume {
+            background: white;
+            padding: 30px;
+            min-height: 650px;
+            color: #1e293b;
+            overflow-wrap: anywhere;
+        }
+
+        #resume h2 {
+            margin: 0;
+            color: #1d4ed8;
+            font-size: 28px;
+        }
+
+        #resume h3 {
+            border-bottom: 2px solid #2563eb;
+            padding-bottom: 5px;
+            margin: 23px 0 10px;
+            font-size: 15px;
+            text-transform: uppercase;
+        }
+
+        #resume p {
+            line-height: 1.5;
+            margin: 6px 0;
+        }
+
+        .contact {
+            color: #475569;
+            font-size: 13px;
+        }
+
+        .resume-text {
+            white-space: pre-wrap;
+        }
+
+        @media (max-width: 760px) {
+            .layout {
+                grid-template-columns: 1fr;
+            }
+
+            #resume {
+                padding: 22px;
+            }
+        }
+
+        @media print {
+            body {
+                background: white;
+            }
+
+            header,
+            .intro,
+            .form-panel,
+            .preview-title,
+            .actions {
+                display: none !important;
+            }
+
+            .container {
+                margin: 0;
+                padding: 0;
+                max-width: none;
+            }
+
+            .layout {
+                display: block;
+            }
+
+            .panel {
+                box-shadow: none;
+                padding: 0;
+            }
+
+            #resume {
+                padding: 15mm;
+                min-height: auto;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <strong>Campus Loop</strong>
+        <a href="index.html">← Back to Home</a>
+    </header>
+
+    <main class="container">
+        <h1>Resume Builder</h1>
+        <p class="intro">Create a professional resume for internships and placements.</p>
+
+        <div class="layout">
+            <section class="panel form-panel">
+                <h2>Your Details</h2>
+
+                <form id="resumeForm">
+                    <label for="name">Full Name *</label>
+                    <input id="name" placeholder="Your full name" required>
+
+                    <label for="email">Email *</label>
+                    <input id="email" type="email" placeholder="you@example.com" required>
+
+                    <label for="phone">Phone</label>
+                    <input id="phone" type="tel" placeholder="+91 XXXXX XXXXX">
+
+                    <label for="location">City</label>
+                    <input id="location" placeholder="Kanpur, Uttar Pradesh">
+
+                    <label for="education">Education</label>
+                    <textarea id="education"
+                        placeholder="B.Tech CSE, Kanpur Institute of Technology&#10;Expected graduation: 2030"></textarea>
+
+                    <label for="skills">Technical Skills</label>
+                    <textarea id="skills" placeholder="C++, C, HTML, CSS, JavaScript"></textarea>
+
+                    <label for="projects">Projects</label>
+                    <textarea id="projects"
+                        placeholder="Campus Loop — a campus management web application&#10;Describe your contribution and technologies used."></textarea>
+
+                    <label for="experience">Experience / Activities</label>
+                    <textarea id="experience"
+                        placeholder="Internships, hackathons, clubs, volunteering, or achievements"></textarea>
+
+                    <label for="summary">Professional Summary</label>
+                    <textarea id="summary" placeholder="Write 2–3 lines about your goals and strengths."></textarea>
+
+                    <label for="linkedin">LinkedIn URL</label>
+                    <input id="linkedin" type="url" placeholder="https://www.linkedin.com/in/your-profile">
+
+                    <label for="github">GitHub URL</label>
+                    <input id="github" type="url" placeholder="https://github.com/your-username">
+
+                    <div class="actions">
+                        <button type="submit" class="primary">Update Preview</button>
+                        <button type="button" class="secondary" id="saveBtn">Save Draft</button>
+                        <button type="button" class="secondary" id="loadBtn">Load Draft</button>
+                    </div>
+                </form>
+            </section>
+
+            <section>
+                <h2 class="preview-title">Live Preview</h2>
+                <div class="panel" id="resume">
+                    <h2 id="outName">Your Name</h2>
+                    <p class="contact" id="outContact">Email · Phone · City</p>
+                    <p class="contact" id="outLinks"></p>
+
+                    <div id="summarySection">
+                        <h3>Professional Summary</h3>
+                        <p class="resume-text" id="outSummary">Your summary will appear here.</p>
+                    </div>
+
+                    <div id="educationSection">
+                        <h3>Education</h3>
+                        <p class="resume-text" id="outEducation">Your education will appear here.</p>
+                    </div>
+
+                    <div id="skillsSection">
+                        <h3>Technical Skills</h3>
+                        <p class="resume-text" id="outSkills">Your skills will appear here.</p>
+                    </div>
+
+                    <div id="projectsSection">
+                        <h3>Projects</h3>
+                        <p class="resume-text" id="outProjects">Your projects will appear here.</p>
+                    </div>
+
+                    <div id="experienceSection">
+                        <h3>Experience & Activities</h3>
+                        <p class="resume-text" id="outExperience">Your experience will appear here.</p>
+                    </div>
+                </div>
+
+                <button type="button" class="primary actions" id="pdfBtn">
+                    Download / Print PDF
+                </button>
+            </section>
+        </div>
+    </main>
+
+    <script>
+        const fields = [
+            "name", "email", "phone", "location",
+            "education", "skills", "projects", "experience",
+            "summary", "linkedin", "github"
+        ];
+
+        const get = id => document.getElementById(id);
+
+        function updatePreview() {
+            get("outName").textContent = get("name").value.trim() || "Your Name";
+
+            const contact = [
+                get("email").value.trim(),
+                get("phone").value.trim(),
+                get("location").value.trim()
+            ].filter(Boolean);
+
+            get("outContact").textContent = contact.join(" · ") || "Email · Phone · City";
+
+            const links = [
+                get("linkedin").value.trim(),
+                get("github").value.trim()
+            ].filter(Boolean);
+
+            get("outLinks").textContent = links.join(" | ");
+
+            const sections = [
+                ["summary", "outSummary", "summarySection", "Your summary will appear here."],
+                ["education", "outEducation", "educationSection", "Your education will appear here."],
+                ["skills", "outSkills", "skillsSection", "Your skills will appear here."],
+                ["projects", "outProjects", "projectsSection", "Your projects will appear here."],
+                ["experience", "outExperience", "experienceSection", "Your experience will appear here."]
+            ];
+
+            sections.forEach(([field, output, section, placeholder]) => {
+                const value = get(field).value.trim();
+                get(output).textContent = value || placeholder;
+                get(section).hidden = !value;
+            });
+        }
+
+        get("resumeForm").addEventListener("input", updatePreview);
+        get("resumeForm").addEventListener("submit", event => {
+            event.preventDefault();
+            updatePreview();
+        });
+
+        get("saveBtn").addEventListener("click", () => {
+            const data = {};
+            fields.forEach(id => data[id] = get(id).value);
+            try {
+                localStorage.setItem("campusLoopResumeDraft", JSON.stringify(data));
+                alert("Resume draft saved in this browser.");
+            } catch (error) {
+                alert("Could not save the draft in this browser.");
+            }
+        });
+
+        get("loadBtn").addEventListener("click", () => {
+            try {
+                const saved = localStorage.getItem("campusLoopResumeDraft");
+                if (!saved) {
+                    alert("No saved resume draft found in this browser.");
+                    return;
+                }
+                const data = JSON.parse(saved);
+                fields.forEach(id => {
+                    if (typeof data[id] === "string") get(id).value = data[id];
+                });
+                updatePreview();
+                alert("Resume draft loaded.");
+            } catch (error) {
+                alert("Could not load the saved draft.");
+            }
+        });
+
+        get("pdfBtn").addEventListener("click", () => {
+            updatePreview();
+            window.print();
+        });
+
+        updatePreview();
+    </script>
+</body>
+
+</html>
