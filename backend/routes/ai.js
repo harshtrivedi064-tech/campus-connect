@@ -3,7 +3,7 @@ const { verifyToken } = require('./auth');
 
 const router = express.Router();
 const requestsByUser = new Map();
-const MODEL = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
+const MODEL = process.env.GEMINI_MODEL || 'gemini-2.5-flash-lite';
 const MAX_HISTORY_MESSAGES = 12;
 const MAX_MESSAGE_LENGTH = 4000;
 const MAX_HISTORY_LENGTH = 12000;

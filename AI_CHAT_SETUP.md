@@ -6,7 +6,7 @@ store it only as a server environment variable.
 1. Create a Gemini API key in Google AI Studio.
 2. In Render, open the Campus Loop service's **Environment** settings and add:
    - `GEMINI_API_KEY`: your Gemini API key
-   - `GEMINI_MODEL`: optional; defaults to `gemini-2.5-flash`
+   - `GEMINI_MODEL`: optional; defaults to `gemini-2.5-flash-lite`
 3. Save the settings and redeploy the service.
 4. Sign in to Campus Loop and open **AI Chat**.
 
