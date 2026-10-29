@@ -47,6 +47,27 @@ router.get('/sessions', requireRole('instructor'), (req, res) => {
   res.json(sessions);
 });
 
+router.get('/report', requireRole('instructor'), (req, res) => {
+  const data = db.load();
+  const students = new Map(data.users.map((user) => [user.id, user]));
+  const records = data.attendanceSessions
+    .filter((session) => session.instructorId === req.user.id)
+    .flatMap((session) => session.records.map((record) => {
+      const student = students.get(record.userId);
+      return {
+        sessionKey: session.id,
+        date: session.date,
+        className: session.className,
+        student: student ? student.name : 'Student account unavailable',
+        email: student ? student.email : '',
+        status: record.status
+      };
+    }))
+    .sort((a, b) => b.date.localeCompare(a.date));
+
+  res.json(records);
+});
+
 router.post('/sessions', requireRole('instructor'), (req, res) => {
   const { className, date, studentIds } = req.body || {};
   const cleanClassName = String(className || '').trim();
@@ -153,6 +174,7 @@ router.get('/mine', requireRole('student'), (req, res) => {
   const records = data.attendanceSessions.flatMap((session) => {
     const record = session.records.find((entry) => entry.userId === req.user.id);
     return record ? [{
+      sessionId: session.id,
       className: session.className,
       date: session.date,
       instructor: instructors.get(session.instructorId) || 'Instructor',

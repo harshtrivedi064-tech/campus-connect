@@ -111,6 +111,36 @@
                 <div id="myAttendance"></div>
             </div>
         </section>
+
+        <section id="reportSection" class="attendance-card" hidden>
+            <div class="attendance-section-heading">
+                <div>
+                    <span class="attendance-eyebrow">ATTENDANCE REPORTS</span>
+                    <h2>Attendance summary</h2>
+                </div>
+                <button id="exportAttendance" type="button" class="attendance-secondary-button">
+                    Export CSV
+                </button>
+            </div>
+
+            <form id="reportFilters" class="attendance-report-filters">
+                <div>
+                    <label for="reportFrom">From</label>
+                    <input id="reportFrom" type="date">
+                </div>
+                <div>
+                    <label for="reportTo">To</label>
+                    <input id="reportTo" type="date">
+                </div>
+                <button type="submit" class="attendance-primary-button">Apply dates</button>
+                <button id="clearReportFilters" type="button" class="attendance-secondary-button">
+                    Clear
+                </button>
+            </form>
+
+            <div id="reportSummary" class="attendance-stats"></div>
+            <div id="reportResults" class="attendance-report-table-wrap" aria-live="polite"></div>
+        </section>
     </main>
 
     <footer class="attendance-footer">

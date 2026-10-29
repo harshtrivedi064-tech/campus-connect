@@ -51,7 +51,10 @@ app.use(express.json({ limit: '100kb' }));
 app.use((req, res, next) => {
   const start = Date.now();
   res.on('finish', () => {
-    console.log(req.method + ' ' + req.originalUrl + ' -> ' + res.statusCode + ' (' + (Date.now() - start) + 'ms)');
+    const requestUrl = req.path === '/auth/google/callback'
+      ? req.path
+      : req.originalUrl;
+    console.log(req.method + ' ' + requestUrl + ' -> ' + res.statusCode + ' (' + (Date.now() - start) + 'ms)');
   });
   next();
 });

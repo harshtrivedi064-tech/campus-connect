@@ -3334,8 +3334,60 @@ button:disabled {
     box-shadow: 0 12px 30px rgba(89, 78, 255, 0.35);
 }
 
+.auth-page .auth-divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 20px 0 14px;
+    color: #8d9cbd;
+    font-size: 11px;
+}
+
+.auth-page .auth-divider::before,
+.auth-page .auth-divider::after {
+    content: "";
+    height: 1px;
+    flex: 1;
+    background: rgba(142, 160, 211, 0.2);
+}
+
+.auth-page .google-login-button {
+    width: 100%;
+    min-height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 11px;
+    border: 1px solid rgba(142, 160, 211, 0.28);
+    border-radius: 12px;
+    background: #fff;
+    color: #263248;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.auth-page .google-login-button:hover {
+    transform: translateY(-1px);
+    background: #f2f5fb;
+}
+
+.auth-page .google-login-button svg {
+    width: 18px;
+    height: 18px;
+}
+
+.auth-page .auth-google-note {
+    margin: 9px 0 0;
+    color: #8d9cbd;
+    font-size: 10px;
+    text-align: center;
+}
+
 .auth-page .auth-submit:focus-visible,
-.auth-page a:focus-visible {
+.auth-page a:focus-visible,
+.auth-page .google-login-button:focus-visible {
     outline: 2px solid #b8a0ff;
     outline-offset: 4px;
 }
@@ -3899,6 +3951,91 @@ button:disabled {
     color: #cbd5e1;
 }
 
+.attendance-report-filters {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) auto auto;
+    align-items: end;
+    gap: 12px;
+    margin-bottom: 22px;
+}
+
+.attendance-report-filters label {
+    display: block;
+}
+
+.attendance-page .attendance-report-filters input {
+    margin-bottom: 0;
+}
+
+.attendance-report-filters .attendance-primary-button,
+.attendance-report-filters .attendance-secondary-button {
+    min-height: 48px;
+    width: auto;
+    white-space: nowrap;
+}
+
+.attendance-secondary-button {
+    padding: 12px 16px;
+    border: 1px solid var(--att-border);
+    border-radius: 12px;
+    background: rgba(8, 15, 37, .4);
+    color: #e2e8f0;
+    font-weight: 700;
+}
+
+.attendance-secondary-button:hover {
+    border-color: #8b5cf6;
+}
+
+.attendance-report-table-wrap {
+    overflow-x: auto;
+}
+
+.attendance-report-note {
+    margin: 0 0 12px;
+    color: var(--att-muted);
+    font-size: .85rem;
+}
+
+.attendance-report-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.attendance-report-table th,
+.attendance-report-table td {
+    padding: 13px 15px;
+    border-bottom: 1px solid var(--att-border);
+    white-space: nowrap;
+}
+
+.attendance-report-table th {
+    color: #c4b5fd;
+    font-size: .8rem;
+    letter-spacing: .04em;
+}
+
+.attendance-report-table td {
+    color: #e2e8f0;
+}
+
+.attendance-report-status {
+    text-transform: capitalize;
+}
+
+.attendance-report-status.present {
+    color: #86efac;
+}
+
+.attendance-report-status.absent {
+    color: #fca5a5;
+}
+
+.attendance-report-status.unmarked {
+    color: #cbd5e1;
+}
+
 .attendance-message {
     color: #86efac;
     line-height: 1.6;
@@ -3927,6 +4064,10 @@ button:disabled {
 
 @media (max-width: 800px) {
     .attendance-stats {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .attendance-report-filters {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 

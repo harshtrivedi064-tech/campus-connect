@@ -1,8 +1,424 @@
 
+const ATTENDANCE_API = /^(localhost|127\.0\.0\.1)$/.test(window.location.hostname)
+    ? 'http://localhost:3000'
+    : '';
+const attendanceToken = localStorage.getItem('token');
+
+let attendanceUser = null;
+let attendanceReportRecords = [];
+let filteredAttendanceReport = [];
+
+try {
+    attendanceUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
+} catch {
+    attendanceUser = null;
+}
+
+function logout() {
+    localStorage.removeItem('token');
+    localStorage.removeItem('currentUser');
+    window.location.href = 'login.html';
+}
+
+function showAttendanceMessage(message, isError = false) {
+    const element = document.getElementById('attendanceMessage');
+    element.textContent = message;
+    element.classList.toggle('error', isError);
+}
+
+async function attendanceRequest(path, method = 'GET', body) {
+    const headers = { Authorization: `Bearer ${attendanceToken}` };
+    const options = { method, headers };
+
+    if (body !== undefined) {
+        headers['Content-Type'] = 'application/json';
+        options.body = JSON.stringify(body);
+    }
+
+    const response = await fetch(ATTENDANCE_API + path, options);
+    if (response.status === 401) {
+        logout();
+        throw new Error('Please log in again.');
+    }
+
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) {
+        throw new Error(data.error || 'Unable to load attendance.');
+    }
+
+    return data;
+}
+
 function escapeAttendanceText(value) {
     const div = document.createElement('div');
     div.textContent = String(value ?? '');
     return div.innerHTML;
+}
+
+function addAttendanceText(parent, tag, className, text) {
+    const element = document.createElement(tag);
+    if (className) element.className = className;
+    element.textContent = String(text ?? '');
+    parent.appendChild(element);
+    return element;
+}
+
+function reportStat(summary, label, value, icon) {
+    const card = document.createElement('article');
+    card.className = 'attendance-stat-card';
+    addAttendanceText(card, 'span', 'attendance-stat-icon', icon);
+    addAttendanceText(card, 'p', '', label);
+    addAttendanceText(card, 'strong', '', value);
+    summary.appendChild(card);
+}
+
+function renderAttendanceReport() {
+    const from = document.getElementById('reportFrom').value;
+    const to = document.getElementById('reportTo').value;
+    const summary = document.getElementById('reportSummary');
+    const results = document.getElementById('reportResults');
+
+    if (from && to && from > to) {
+        filteredAttendanceReport = [];
+        summary.replaceChildren();
+        results.replaceChildren();
+        showAttendanceMessage('The start date must be on or before the end date.', true);
+        return false;
+    }
+
+    showAttendanceMessage('');
+    filteredAttendanceReport = attendanceReportRecords.filter(record =>
+        (!from || record.date >= from) && (!to || record.date <= to)
+    );
+
+    const present = filteredAttendanceReport.filter(
+        record => record.status === 'present'
+    ).length;
+    const absent = filteredAttendanceReport.filter(
+        record => record.status === 'absent'
+    ).length;
+    const unmarked = filteredAttendanceReport.filter(
+        record => record.status === 'unmarked'
+    ).length;
+    const marked = present + absent;
+    const rate = marked ? `${((present / marked) * 100).toFixed(1)}%` : '—';
+    const sessions = new Set(filteredAttendanceReport.map(record => record.sessionKey));
+
+    summary.replaceChildren();
+    reportStat(summary, 'Class sessions', String(sessions.size), '▦');
+    reportStat(summary, 'Present', String(present), '✓');
+    reportStat(summary, 'Absent', String(absent), '×');
+    reportStat(summary, 'Attendance rate', rate, '◉');
+
+    results.replaceChildren();
+    if (!filteredAttendanceReport.length) {
+        addAttendanceText(results, 'p', 'attendance-empty',
+            'No attendance records match this date range.');
+        return true;
+    }
+
+    if (unmarked) {
+        addAttendanceText(results, 'p', 'attendance-report-note',
+            `${unmarked} unmarked record${unmarked === 1 ? '' : 's'} excluded from the attendance rate.`);
+    }
+
+    const table = document.createElement('table');
+    table.className = 'attendance-report-table';
+    const head = document.createElement('thead');
+    const headerRow = document.createElement('tr');
+    const columns = attendanceUser.role === 'instructor'
+        ? ['Date', 'Class', 'Student', 'Email', 'Status']
+        : ['Date', 'Class', 'Instructor', 'Status'];
+    columns.forEach(column => addAttendanceText(headerRow, 'th', '', column));
+    head.appendChild(headerRow);
+    table.appendChild(head);
+
+    const body = document.createElement('tbody');
+    filteredAttendanceReport.forEach(record => {
+        const row = document.createElement('tr');
+        const values = attendanceUser.role === 'instructor'
+            ? [record.date, record.className, record.student, record.email, record.status]
+            : [record.date, record.className, record.instructor, record.status];
+        values.forEach((value, index) => {
+            const cell = document.createElement('td');
+            cell.textContent = String(value || '');
+            if (columns[index] === 'Status') {
+                cell.className = `attendance-report-status ${record.status}`;
+            }
+            row.appendChild(cell);
+        });
+        body.appendChild(row);
+    });
+    table.appendChild(body);
+    results.appendChild(table);
+    return true;
+}
+
+async function loadAttendanceReport() {
+    const section = document.getElementById('reportSection');
+    section.hidden = false;
+    document.getElementById('reportResults').textContent = 'Loading report...';
+
+    try {
+        if (attendanceUser.role === 'instructor') {
+            attendanceReportRecords = await attendanceRequest('/attendance/report');
+        } else {
+            const records = await attendanceRequest('/attendance/mine');
+            attendanceReportRecords = records.map(record => ({
+                sessionKey: record.sessionId ||
+                    `${record.date}|${record.className}|${record.instructor}`,
+                date: record.date,
+                className: record.className,
+                student: attendanceUser.name,
+                instructor: record.instructor,
+                status: record.status
+            }));
+        }
+
+        return renderAttendanceReport();
+    } catch (error) {
+        attendanceReportRecords = [];
+        filteredAttendanceReport = [];
+        document.getElementById('reportSummary').replaceChildren();
+        document.getElementById('reportResults').replaceChildren();
+        addAttendanceText(document.getElementById('reportResults'), 'p',
+            'attendance-empty', error.message);
+        showAttendanceMessage(error.message, true);
+        return false;
+    }
+}
+
+function csvCell(value) {
+    let text = String(value ?? '');
+    if (/^[\s]*[=+\-@]/.test(text)) text = `'${text}`;
+    return `"${text.replace(/"/g, '""')}"`;
+}
+
+function exportAttendanceReport() {
+    if (!filteredAttendanceReport.length) {
+        showAttendanceMessage('There are no attendance records to export.', true);
+        return;
+    }
+
+    const instructorReport = attendanceUser.role === 'instructor';
+    const headers = instructorReport
+        ? ['Date', 'Class', 'Student', 'Email', 'Status']
+        : ['Date', 'Class', 'Instructor', 'Status'];
+    const rows = filteredAttendanceReport.map(record => instructorReport
+        ? [record.date, record.className, record.student, record.email, record.status]
+        : [record.date, record.className, record.instructor, record.status]
+    );
+    const csv = [headers, ...rows]
+        .map(row => row.map(csvCell).join(','))
+        .join('\r\n');
+    const url = URL.createObjectURL(new Blob(['\uFEFF', csv], {
+        type: 'text/csv;charset=utf-8'
+    }));
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `attendance-report-${new Date().toISOString().slice(0, 10)}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+function initializeAttendanceReports() {
+    document.getElementById('reportFilters').addEventListener('submit', event => {
+        event.preventDefault();
+        renderAttendanceReport();
+    });
+    document.getElementById('clearReportFilters').addEventListener('click', () => {
+        document.getElementById('reportFilters').reset();
+        renderAttendanceReport();
+    });
+    document.getElementById('exportAttendance').addEventListener(
+        'click', exportAttendanceReport
+    );
+    loadAttendanceReport();
+}
+
+async function loadStudents() {
+    const choices = document.getElementById('studentChoices');
+    choices.textContent = 'Loading students...';
+
+    try {
+        const students = await attendanceRequest('/attendance/students');
+        choices.replaceChildren();
+
+        if (!students.length) {
+            addAttendanceText(choices, 'p', 'attendance-empty',
+                'No student accounts are registered yet.');
+            return;
+        }
+
+        students.forEach((student) => {
+            const label = document.createElement('label');
+            label.className = 'student-choice';
+
+            const input = document.createElement('input');
+            input.type = 'checkbox';
+            input.name = 'studentIds';
+            input.value = String(student.id);
+
+            const identity = document.createElement('span');
+            identity.textContent = `${student.name} (${student.email})`;
+            label.append(input, identity);
+            choices.appendChild(label);
+        });
+    } catch (error) {
+        choices.replaceChildren();
+        addAttendanceText(choices, 'p', 'attendance-empty', error.message);
+        showAttendanceMessage(error.message, true);
+    }
+}
+
+async function loadSessions() {
+    const list = document.getElementById('sessionList');
+    list.textContent = 'Loading class sessions...';
+
+    try {
+        const sessions = await attendanceRequest('/attendance/sessions');
+        list.replaceChildren();
+
+        if (!sessions.length) {
+            addAttendanceText(list, 'p', 'attendance-empty',
+                'You have not created any class sessions yet.');
+            return true;
+        }
+
+        sessions.forEach((session) => {
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.className = 'session-button';
+            button.setAttribute('aria-label',
+                `View attendance for ${session.className} on ${session.date}`);
+
+            const name = document.createElement('strong');
+            name.textContent = session.className;
+            const details = document.createElement('span');
+            details.textContent =
+                ` · ${session.date} · ${session.presentCount}/${session.studentCount} present`;
+            button.append(name, details);
+            button.addEventListener('click', () => loadRoster(session.id));
+            list.appendChild(button);
+        });
+        return true;
+    } catch (error) {
+        list.replaceChildren();
+        addAttendanceText(list, 'p', 'attendance-empty', error.message);
+        showAttendanceMessage(error.message, true);
+        return false;
+    }
+}
+
+async function loadRoster(sessionId) {
+    const section = document.getElementById('rosterSection');
+    const list = document.getElementById('rosterList');
+    const title = document.getElementById('rosterTitle');
+    section.hidden = false;
+    list.textContent = 'Loading class roster...';
+
+    try {
+        const session = await attendanceRequest(
+            `/attendance/sessions/${encodeURIComponent(sessionId)}`
+        );
+        title.textContent = `${session.className} · ${session.date}`;
+        list.replaceChildren();
+
+        if (!session.records.length) {
+            addAttendanceText(list, 'p', 'attendance-empty',
+                'There are no students on this roster.');
+            return true;
+        }
+
+        session.records.forEach((record) => {
+            const row = document.createElement('div');
+            row.className = 'attendance-row';
+            row.dataset.studentId = String(record.userId);
+
+            const identity = document.createElement('div');
+            identity.className = 'attendance-identity';
+            addAttendanceText(identity, 'strong', '', record.name);
+            if (record.email) addAttendanceText(identity, 'small', '', record.email);
+
+            const actions = document.createElement('div');
+            actions.className = 'attendance-actions';
+            const status = addAttendanceText(actions, 'span', 'attendance-status',
+                record.status === 'unmarked' ? 'Not marked' :
+                    record.status[0].toUpperCase() + record.status.slice(1));
+
+            ['present', 'absent'].forEach((value) => {
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.textContent = value === 'present' ? 'Present' : 'Absent';
+                button.classList.toggle('selected', record.status === value);
+                button.setAttribute('aria-pressed', String(record.status === value));
+                button.addEventListener('click', async () => {
+                    actions.querySelectorAll('button').forEach(item => {
+                        item.disabled = true;
+                    });
+                    try {
+                        await attendanceRequest(
+                            `/attendance/sessions/${encodeURIComponent(session.id)}` +
+                                `/records/${encodeURIComponent(record.userId)}`,
+                            'PATCH',
+                            { status: value }
+                        );
+                        const rosterLoaded = await loadRoster(session.id);
+                        const sessionsLoaded = await loadSessions();
+                        const reportLoaded = await loadAttendanceReport();
+                        if (rosterLoaded && sessionsLoaded && reportLoaded) {
+                            showAttendanceMessage('Attendance updated.');
+                        }
+                    } catch (error) {
+                        showAttendanceMessage(error.message, true);
+                    } finally {
+                        actions.querySelectorAll('button').forEach(item => {
+                            item.disabled = false;
+                        });
+                    }
+                });
+                actions.appendChild(button);
+            });
+
+            row.append(identity, actions);
+            list.appendChild(row);
+            actions.insertBefore(status, actions.firstChild);
+        });
+        return true;
+    } catch (error) {
+        list.replaceChildren();
+        addAttendanceText(list, 'p', 'attendance-empty', error.message);
+        showAttendanceMessage(error.message, true);
+        return false;
+    }
+}
+
+async function createAttendanceSession(event) {
+    event.preventDefault();
+    const form = document.getElementById('sessionForm');
+    const submit = form.querySelector('button[type="submit"]');
+    const studentIds = Array.from(
+        form.querySelectorAll('input[name="studentIds"]:checked'),
+        input => Number(input.value)
+    );
+
+    submit.disabled = true;
+    try {
+        await attendanceRequest('/attendance/sessions', 'POST', {
+            className: document.getElementById('className').value.trim(),
+            date: document.getElementById('classDate').value,
+            studentIds
+        });
+        form.reset();
+        showAttendanceMessage('Class session created.');
+        await loadSessions();
+    } catch (error) {
+        showAttendanceMessage(error.message, true);
+    } finally {
+        submit.disabled = false;
+    }
 }
 
 function getAttendanceGroups(records) {
@@ -257,3 +673,30 @@ async function loadMyAttendance() {
         showAttendanceMessage(error.message, true);
     }
 }
+
+function initializeAttendance() {
+    if (!attendanceToken || !attendanceUser) {
+        window.location.href = 'login.html';
+        return;
+    }
+
+    if (attendanceUser.role === 'instructor') {
+        document.getElementById('instructorView').hidden = false;
+        initializeAttendanceReports();
+        document.getElementById('sessionForm').addEventListener(
+            'submit', createAttendanceSession
+        );
+        const today = new Date();
+        today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
+        document.getElementById('classDate').value = today.toISOString().slice(0, 10);
+        loadStudents();
+        loadSessions();
+        return;
+    }
+
+    document.getElementById('studentView').hidden = false;
+    initializeAttendanceReports();
+    loadMyAttendance();
+}
+
+initializeAttendance();
