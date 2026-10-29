@@ -106,14 +106,30 @@ router.post('/chat', verifyToken, async (req, res) => {
 
     const result = await response.json().catch(() => ({}));
     if (!response.ok) {
-      console.error('Gemini chat request failed with status:', response.status);
+      const providerMessage = String(result.error?.message || '');
+      console.error('Gemini chat request failed:', {
+        status: response.status,
+        message: providerMessage || 'No provider error message returned.'
+      });
       if (response.status === 429) {
         return res.status(503).json({
           error: 'The AI service is busy or its quota was reached. Please try again later.'
         });
       }
+      if (response.status === 401 || response.status === 403 ||
+          /api[\s_-]*key|api_key_invalid/i.test(providerMessage)) {
+        return res.status(502).json({
+          error: 'Gemini rejected the API key or access. In Render, check GEMINI_API_KEY and confirm the key can use the Gemini API.'
+        });
+      }
+      if (response.status === 404 ||
+          /model.{0,50}(not found|not available|unsupported)/i.test(providerMessage)) {
+        return res.status(502).json({
+          error: `Gemini model "${MODEL}" is unavailable. Set GEMINI_MODEL in Render to a model available to your API key.`
+        });
+      }
       return res.status(502).json({
-        error: 'The AI service could not answer right now. Please try again.'
+        error: 'Gemini rejected the request. Check the Render service logs for the provider error, then verify the key and model settings.'
       });
     }
 
