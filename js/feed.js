@@ -1,129 +1,14 @@
 const API = /^(localhost|127\.0\.0\.1)$/.test(window.location.hostname)
     ? 'http://localhost:3000'
     : '';
-
-// If the user is not logged in, send them to the login page
 const token = localStorage.getItem('token');
-const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-if (!token || !currentUser) {
-    window.location.href = 'login.html';
-}
 
-document.getElementById('welcome').textContent = 'Welcome, ' + currentUser.name;
-
-const postText = document.getElementById('postText');
-const counter = document.getElementById('counter');
-
-postText.addEventListener('input', function () {
-    counter.textContent = postText.value.length + ' / 300';
-});
-
-// Helper: sends a request with the login token
-async function apiRequest(path, method, body) {
-    const res = await fetch(API + path, {
-        method: method || 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + token
-        },
-        body: body ? JSON.stringify(body) : undefined
-    });
-
-    if (res.status === 401) {
-        logout();
-        return null;
-    }
-
-    const data = await res.json();
-    if (!res.ok) {
-        alert(data.error || 'Something went wrong.');
-        return null;
-    }
-    return data;
-}
-
-async function addPost() {
-    const text = postText.value.trim();
-    if (!text) return;
-
-    const post = await apiRequest('/posts', 'POST', { text });
-    if (!post) return;
-
-    postText.value = '';
-    counter.textContent = '0 / 300';
-    showPosts();
-}
-
-async function deletePost(id) {
-    if (!confirm('Delete this post?')) return;
-    const result = await apiRequest('/posts/' + id, 'DELETE');
-    if (result) showPosts();
-}
-
-async function showPosts() {
-    const list = document.getElementById('postList');
-
-    let posts;
-    try {
-        posts = await apiRequest('/posts');
-    } catch (err) {
-        list.innerHTML = '';
-        const msg = document.createElement('p');
-        msg.className = 'empty';
-        msg.textContent = 'Cannot reach the server. Is the backend running?';
-        list.appendChild(msg);
-        return;
-    }
-    if (!posts) return;
-
-    list.innerHTML = '';
-
-    if (posts.length === 0) {
-        const empty = document.createElement('p');
-        empty.className = 'empty';
-        empty.textContent = 'No posts yet. Be the first to share something!';
-        list.appendChild(empty);
-        return;
-    }
-
-    posts.forEach(p => {
-        const div = document.createElement('div');
-        div.className = 'post';
-
-        const header = document.createElement('div');
-        header.className = 'post-header';
-
-        const avatar = document.createElement('div');
-        avatar.className = 'avatar';
-        avatar.textContent = p.name.charAt(0).toUpperCase();
-
-        const info = document.createElement('div');
-        info.className = 'post-info';
-
-        const name = document.createElement('strong');
-        name.textContent = p.name;
-
-        const time = document.createElement('small');
-        time.textContent = new Date(p.time).toLocaleString();
-
-        info.append(name, time);
-        header.append(avatar, info);
-
-        if (p.userId === currentUser.id) {
-            const del = document.createElement('button');
-            del.className = 'delete-btn';
-            del.textContent = 'Delete';
-            del.onclick = function () { deletePost(p.id); };
-            header.appendChild(del);
-        }
-
-        const text = document.createElement('p');
-        text.className = 'post-text';
-        text.textContent = p.text;
-
-        div.append(header, text);
-        list.appendChild(div);
-    });
+let currentUser = null;
+let allFeedPosts = [];
+try {
+    currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
+} catch {
+    currentUser = null;
 }
 
 function logout() {
@@ -132,4 +17,174 @@ function logout() {
     window.location.href = 'login.html';
 }
 
-showPosts();
+async function apiRequest(path, method = 'GET', body) {
+    const headers = {};
+    const options = { method, headers };
+
+    if (token) headers.Authorization = `Bearer ${token}`;
+    if (body !== undefined) {
+        headers['Content-Type'] = 'application/json';
+        options.body = JSON.stringify(body);
+    }
+
+    const response = await fetch(API + path, options);
+    if (response.status === 401) {
+        logout();
+        throw new Error('Please log in again.');
+    }
+
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) {
+        throw new Error(data.error || 'Unable to complete the request.');
+    }
+    return data;
+}
+
+function addFeedText(parent, tag, className, text) {
+    const element = document.createElement(tag);
+    if (className) element.className = className;
+    element.textContent = String(text ?? '');
+    parent.appendChild(element);
+    return element;
+}
+
+function showFeedMessage(text, isError = false) {
+    const message = document.getElementById('quickPostMessage');
+    message.textContent = text;
+    message.classList.toggle('feed-message-error', isError);
+}
+
+function renderPost(post) {
+    const article = document.createElement('article');
+    article.className = 'feed-post';
+
+    const header = document.createElement('div');
+    header.className = 'feed-post-header';
+
+    addFeedText(header, 'div', 'feed-avatar',
+        (post.name || 'Campus Loop').trim().charAt(0).toUpperCase() || 'C');
+
+    const identity = document.createElement('div');
+    addFeedText(identity, 'strong', '', post.name || 'Campus Loop');
+    const timestamp = new Date(post.time);
+    addFeedText(identity, 'small', '',
+        Number.isNaN(timestamp.getTime()) ? '' : timestamp.toLocaleString());
+    header.appendChild(identity);
+    article.appendChild(header);
+
+    addFeedText(article, 'p', 'feed-post-content', post.text);
+
+    if (currentUser && post.userId === currentUser.id) {
+        const actions = document.createElement('div');
+        actions.className = 'feed-post-actions';
+        const remove = addFeedText(actions, 'button', '', 'Delete');
+        remove.type = 'button';
+        remove.addEventListener('click', () => deletePost(post.id, remove));
+        article.appendChild(actions);
+    }
+
+    return article;
+}
+
+function renderFeedPosts() {
+    const list = document.getElementById('quickFeedPosts');
+    const query = document.getElementById('feedSearch').value.trim().toLocaleLowerCase();
+    const sortOrder = document.getElementById('feedSort').value;
+    const matchingPosts = allFeedPosts.filter(post =>
+        String(post.text || '').toLocaleLowerCase().includes(query) ||
+        String(post.name || '').toLocaleLowerCase().includes(query)
+    );
+
+    matchingPosts.sort((first, second) => {
+        const firstTime = new Date(first.time).getTime() || 0;
+        const secondTime = new Date(second.time).getTime() || 0;
+        return sortOrder === 'oldest'
+            ? firstTime - secondTime
+            : secondTime - firstTime;
+    });
+
+    list.replaceChildren();
+    const count = document.getElementById('feedResultCount');
+    count.textContent = query
+        ? `${matchingPosts.length} of ${allFeedPosts.length} posts`
+        : `${allFeedPosts.length} ${allFeedPosts.length === 1 ? 'post' : 'posts'}`;
+
+    if (!matchingPosts.length) {
+        addFeedText(list, 'p', 'feed-muted', query
+            ? 'No posts match your search.'
+            : 'No posts yet. Be the first to share something!');
+        return;
+    }
+
+    matchingPosts.forEach(post => list.appendChild(renderPost(post)));
+}
+
+async function loadPosts() {
+    const list = document.getElementById('quickFeedPosts');
+    list.replaceChildren();
+    addFeedText(list, 'p', 'feed-muted', 'Loading posts...');
+    document.getElementById('feedResultCount').textContent = '';
+
+    try {
+        allFeedPosts = await apiRequest('/posts');
+        renderFeedPosts();
+    } catch (error) {
+        allFeedPosts = [];
+        list.replaceChildren();
+        addFeedText(list, 'p', 'feed-muted', error.message);
+        document.getElementById('feedResultCount').textContent = '';
+    }
+}
+
+async function addPost(event) {
+    event.preventDefault();
+    const form = document.getElementById('quickPostForm');
+    const input = document.getElementById('quickPostContent');
+    const submit = form.querySelector('button[type="submit"]');
+    const text = input.value.trim();
+
+    if (!text) {
+        showFeedMessage('Write something before sharing.', true);
+        return;
+    }
+
+    submit.disabled = true;
+    showFeedMessage('Sharing your post...');
+    try {
+        await apiRequest('/posts', 'POST', { text });
+        input.value = '';
+        showFeedMessage('Your post was shared.');
+        await loadPosts();
+    } catch (error) {
+        showFeedMessage(error.message, true);
+    } finally {
+        submit.disabled = false;
+    }
+}
+
+async function deletePost(id, button) {
+    if (!window.confirm('Delete this post?')) return;
+
+    button.disabled = true;
+    try {
+        await apiRequest(`/posts/${encodeURIComponent(id)}`, 'DELETE');
+        await loadPosts();
+    } catch (error) {
+        button.disabled = false;
+        showFeedMessage(error.message, true);
+    }
+}
+
+function initializeFeed() {
+    if (!token || !currentUser || typeof currentUser.name !== 'string') {
+        window.location.replace('login.html');
+        return;
+    }
+
+    document.getElementById('quickPostForm').addEventListener('submit', addPost);
+    document.getElementById('feedSearch').addEventListener('input', renderFeedPosts);
+    document.getElementById('feedSort').addEventListener('change', renderFeedPosts);
+    loadPosts();
+}
+
+initializeFeed();

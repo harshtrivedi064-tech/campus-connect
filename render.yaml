@@ -18,3 +18,5 @@ services:
         sync: false
       - key: GOOGLE_REDIRECT_URI
         sync: false
+      - key: GEMINI_API_KEY
+        sync: false

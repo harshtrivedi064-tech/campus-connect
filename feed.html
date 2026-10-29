@@ -1,4 +1,3 @@
-```html
 <!DOCTYPE html>
 <html lang="en">
 
@@ -142,8 +141,21 @@
         }
 
         .feed-page textarea:focus,
-        .feed-page input:focus {
+        .feed-page input:focus,
+        .feed-page select:focus {
             border-color: #9b87ff;
+        }
+
+        .feed-toolbar {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 170px;
+            gap: 12px;
+            margin: 18px 0;
+        }
+
+        .feed-page .feed-toolbar input,
+        .feed-page .feed-toolbar select {
+            margin: 0;
         }
 
         .feed-button {
@@ -158,6 +170,12 @@
 
         .feed-button:hover {
             filter: brightness(1.12);
+        }
+
+        .feed-button:disabled,
+        .feed-post-actions button:disabled {
+            cursor: wait;
+            opacity: .65;
         }
 
         .feed-post {
@@ -238,6 +256,10 @@
             font-size: 13px;
         }
 
+        .feed-message-error {
+            color: #fca5a5;
+        }
+
         .feed-footer {
             padding: 25px;
             text-align: center;
@@ -265,6 +287,10 @@
             .feed-layout {
                 grid-template-columns: 1fr;
             }
+
+            .feed-toolbar {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
@@ -280,6 +306,7 @@
             <a href="attendance.html">Attendance</a>
             <a href="events.html">Events</a>
             <a href="mcq.html">MCQ Maker</a>
+            <a href="ai-chat.html">AI Chat</a>
             <a href="#" onclick="logout(); return false;">Logout</a>
         </div>
     </nav>
@@ -300,7 +327,7 @@
                     <p class="feed-muted">Share an update with your campus community.</p>
 
                     <form id="quickPostForm">
-                        <textarea id="quickPostContent" placeholder="What's on your mind?" maxlength="2000"
+                        <textarea id="quickPostContent" placeholder="What's on your mind?" maxlength="300"
                             required></textarea>
 
                         <button class="feed-button" type="submit">Share post ↗</button>
@@ -313,6 +340,15 @@
                     <p class="feed-muted">
                         Your campus posts will appear here.
                     </p>
+                    <div class="feed-toolbar">
+                        <input id="feedSearch" type="search" placeholder="Search posts or authors"
+                            aria-label="Search posts by text or author">
+                        <select id="feedSort" aria-label="Sort posts">
+                            <option value="newest">Newest first</option>
+                            <option value="oldest">Oldest first</option>
+                        </select>
+                    </div>
+                    <p id="feedResultCount" class="feed-muted" aria-live="polite"></p>
                     <div id="quickFeedPosts">
                         <p class="feed-muted">
                             Connect this section to your existing feed system to display posts.
@@ -345,56 +381,7 @@
         © Campus Loop · Built for campus life
     </footer>
 
-    <script>
-        // Temporary front-end preview.
-        // Connect this form to your existing backend before using it for real posts.
-        document.getElementById('quickPostForm').addEventListener('submit', function (event) {
-            event.preventDefault();
-
-            const input = document.getElementById('quickPostContent');
-            const message = document.getElementById('quickPostMessage');
-            const posts = document.getElementById('quickFeedPosts');
-            const content = input.value.trim();
-
-            if (!content) return;
-
-            const post = document.createElement('article');
-            post.className = 'feed-post';
-
-            const header = document.createElement('div');
-            header.className = 'feed-post-header';
-
-            const avatar = document.createElement('div');
-            avatar.className = 'feed-avatar';
-            avatar.textContent = 'Y';
-
-            const identity = document.createElement('div');
-            const name = document.createElement('strong');
-            name.textContent = 'Your post';
-
-            const time = document.createElement('small');
-            time.textContent = 'Just now';
-
-            identity.append(name, time);
-            header.append(avatar, identity);
-
-            const body = document.createElement('p');
-            body.className = 'feed-post-content';
-            body.textContent = content;
-
-            post.append(header, body);
-
-            const placeholder = posts.querySelector('.feed-muted');
-            if (placeholder) posts.replaceChildren();
-
-            posts.prepend(post);
-            input.value = '';
-            message.textContent = 'Post added to this page preview.';
-        });
-    </script>
-
-    <script src="js/auth.js"></script>
+    <script src="js/feed.js"></script>
 </body>
 
 </html>
-```

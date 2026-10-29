@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#080f25">
+    <title>AI Chat | Campus Loop</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .ai-chat-page {
+            min-height: 100vh;
+            color: #f5f6ff;
+            background:
+                radial-gradient(ellipse at 15% 0%, #28205a 0%, transparent 40%),
+                #080f25;
+        }
+
+        .ai-chat-page .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 18px;
+            padding: 18px 6%;
+            border-bottom: 1px solid #ffffff15;
+            background: #080f25dd;
+        }
+
+        .ai-brand {
+            color: white;
+            font-size: 22px;
+            font-weight: 800;
+            text-decoration: none;
+        }
+
+        .ai-brand span,
+        .ai-hero h1 span {
+            color: #b8a3ff;
+        }
+
+        .ai-chat-page .nav-links {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 18px;
+        }
+
+        .ai-chat-page .nav-links a {
+            color: #c5c9dc;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .ai-chat-page .nav-links a:hover,
+        .ai-chat-page .nav-links a.active {
+            color: #b8a3ff;
+        }
+
+        .ai-chat-container {
+            width: min(880px, 92%);
+            margin: 34px auto;
+        }
+
+        .ai-hero {
+            margin-bottom: 20px;
+        }
+
+        .ai-eyebrow {
+            color: #b9a5ff;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 1.8px;
+        }
+
+        .ai-hero h1 {
+            margin: 10px 0;
+            font-size: clamp(30px, 5vw, 42px);
+        }
+
+        .ai-hero p,
+        .ai-disclaimer {
+            color: #aab5d0;
+            line-height: 1.65;
+        }
+
+        .ai-chat-card {
+            overflow: hidden;
+            border: 1px solid #ffffff1c;
+            border-radius: 20px;
+            background: #111a31e8;
+            box-shadow: 0 16px 45px #00000025;
+        }
+
+        .ai-chat-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 14px;
+            padding: 16px 20px;
+            border-bottom: 1px solid #ffffff14;
+        }
+
+        .ai-chat-heading strong {
+            display: block;
+        }
+
+        .ai-chat-heading small {
+            display: block;
+            margin-top: 4px;
+            color: #9da8c4;
+        }
+
+        .ai-clear-button {
+            padding: 9px 12px;
+            border: 1px solid #ffffff25;
+            border-radius: 9px;
+            background: #ffffff08;
+            color: #dce2f3;
+            cursor: pointer;
+        }
+
+        .ai-messages {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            min-height: 320px;
+            max-height: 55vh;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .ai-message {
+            width: fit-content;
+            max-width: min(88%, 680px);
+            padding: 12px 15px;
+            border: 1px solid #ffffff14;
+            border-radius: 14px;
+            color: #e8ebf8;
+            line-height: 1.7;
+            overflow-wrap: anywhere;
+            white-space: pre-wrap;
+        }
+
+        .ai-message.assistant {
+            align-self: flex-start;
+            background: #ffffff08;
+        }
+
+        .ai-message.user {
+            align-self: flex-end;
+            border-color: #7862d766;
+            background: #6d54d52b;
+        }
+
+        .ai-suggestions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            padding: 0 20px 16px;
+        }
+
+        .ai-suggestions button {
+            padding: 8px 11px;
+            border: 1px solid #ffffff20;
+            border-radius: 999px;
+            background: #ffffff08;
+            color: #cdd4e9;
+            cursor: pointer;
+        }
+
+        .ai-suggestions button:hover,
+        .ai-clear-button:hover {
+            border-color: #9b87ff;
+        }
+
+        .ai-composer {
+            padding: 16px 20px;
+            border-top: 1px solid #ffffff14;
+            background: #080f2555;
+        }
+
+        .ai-composer textarea {
+            box-sizing: border-box;
+            width: 100%;
+            min-height: 82px;
+            max-height: 200px;
+            resize: vertical;
+            padding: 13px;
+            border: 1px solid #343e5c;
+            border-radius: 12px;
+            outline: none;
+            background: #080f25;
+            color: #fff;
+            font: inherit;
+        }
+
+        .ai-composer textarea:focus {
+            border-color: #9b87ff;
+        }
+
+        .ai-composer-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-top: 10px;
+        }
+
+        .ai-composer-footer small {
+            color: #9da8c4;
+        }
+
+        .ai-send-button {
+            padding: 11px 18px;
+            border: 0;
+            border-radius: 10px;
+            background: linear-gradient(110deg, #7957ee, #4d75f5);
+            color: white;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .ai-send-button:disabled {
+            cursor: wait;
+            opacity: .65;
+        }
+
+        .ai-status {
+            min-height: 1.4em;
+            margin: 8px 0 0;
+            color: #b9a5ff;
+            font-size: 13px;
+        }
+
+        .ai-status.error {
+            color: #fca5a5;
+        }
+
+        .ai-disclaimer {
+            margin: 12px 2px;
+            font-size: 12px;
+        }
+
+        @media (max-width: 600px) {
+            .ai-chat-page .navbar {
+                padding: 16px 5%;
+            }
+
+            .ai-chat-page .nav-links {
+                gap: 12px;
+            }
+
+            .ai-chat-page .nav-links a {
+                font-size: 12px;
+            }
+
+            .ai-messages {
+                min-height: 260px;
+                padding: 15px;
+            }
+
+            .ai-composer {
+                padding: 14px;
+            }
+        }
+    </style>
+</head>
+
+<body class="ai-chat-page">
+    <nav class="navbar">
+        <a href="index.html" class="ai-brand">Campus <span>Loop</span></a>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="feed.html">Feed</a>
+            <a href="attendance.html">Attendance</a>
+            <a href="events.html">Events</a>
+            <a href="mcq.html">MCQ Maker</a>
+            <a href="ai-chat.html" class="active" aria-current="page">AI Chat</a>
+            <a href="#" id="aiLogout">Logout</a>
+        </div>
+    </nav>
+
+    <main class="ai-chat-container">
+        <header class="ai-hero">
+            <span class="ai-eyebrow">YOUR STUDY COMPANION</span>
+            <h1>Campus Loop <span>AI Chat</span></h1>
+            <p>Ask questions, explore ideas, or get help breaking down a tricky topic.</p>
+        </header>
+
+        <section class="ai-chat-card" aria-label="AI chat">
+            <div class="ai-chat-heading">
+                <div>
+                    <strong>Campus Loop AI</strong>
+                    <small>Powered by Google Gemini</small>
+                </div>
+                <button id="clearChat" type="button" class="ai-clear-button">New chat</button>
+            </div>
+
+            <div id="chatMessages" class="ai-messages" role="log"
+                aria-live="polite" aria-relevant="additions text"></div>
+
+            <div class="ai-suggestions" aria-label="Suggested questions">
+                <button type="button" data-prompt="Explain a difficult topic in simple steps.">
+                    Explain a topic
+                </button>
+                <button type="button" data-prompt="Help me make a focused study plan for this week.">
+                    Make a study plan
+                </button>
+                <button type="button" data-prompt="Quiz me with five questions about a topic I choose.">
+                    Quiz me
+                </button>
+            </div>
+
+            <form id="chatForm" class="ai-composer">
+                <label for="chatInput" class="ai-eyebrow">YOUR MESSAGE</label>
+                <textarea id="chatInput" maxlength="4000" required
+                    placeholder="Ask Campus Loop AI anything..."></textarea>
+                <div class="ai-composer-footer">
+                    <small id="chatCounter">0 / 4000 · Enter to send</small>
+                    <button id="sendChat" type="submit" class="ai-send-button">Send ↗</button>
+                </div>
+                <p id="chatStatus" class="ai-status" role="status" aria-live="polite"></p>
+            </form>
+        </section>
+
+        <p class="ai-disclaimer">
+            AI can make mistakes. Don’t share passwords or sensitive personal information.
+            Messages are sent to Google Gemini and are not saved in your Campus Loop account.
+        </p>
+    </main>
+
+    <script src="js/ai-chat.js"></script>
+</body>
+
+</html>

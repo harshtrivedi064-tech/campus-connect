@@ -15,6 +15,7 @@ const { router: authRouter } = require('./routes/auth');
 const postsRouter = require('./routes/posts');
 const attendanceRouter = require('./routes/attendance');
 const eventsRouter = require('./routes/events');
+const aiRouter = require('./routes/ai');
 
 let mcqRouter = null;
 try {
@@ -108,6 +109,7 @@ app.use('/auth', authLimiter, authRouter);
 app.use('/posts', postsRouter);
 app.use('/attendance', attendanceRouter);
 app.use('/events', eventsRouter);
+app.use('/ai', aiRouter);
 
 if (mcqRouter) {
   app.use('/mcq', mcqRouter);

@@ -1,6 +1,9 @@
-const API = /^(localhost|127\.0\.0\.1)$/.test(window.location.hostname)
+const API = window.location.protocol === 'file:' ||
+    /^(localhost|127\.0\.0\.1)$/.test(window.location.hostname)
     ? 'http://localhost:3000'
     : '';
+const CONNECTION_ERROR =
+    'Cannot connect to Campus Loop. Run the backend with "npm start" from the backend folder, or open the deployed site and try again.';
 
 function showSignup() {
     document.getElementById('loginSection').style.display = 'none';
@@ -97,7 +100,7 @@ async function signup() {
         showLogin();
         showMessage(data.message, 'green');
     } catch (err) {
-        showMessage('Cannot reach the server. Is the backend running?', 'red');
+        showMessage(CONNECTION_ERROR, 'red');
     }
 }
 
@@ -122,7 +125,7 @@ async function login() {
         localStorage.setItem('currentUser', JSON.stringify(data.user));
         window.location.href = 'feed.html';
     } catch (err) {
-        showMessage('Cannot reach the server. Is the backend running?', 'red');
+        showMessage(CONNECTION_ERROR, 'red');
     }
 }
 
