@@ -12,20 +12,11 @@ try {
   currentUser = null;
 }
 
-if (!token || !currentUser) {
-  window.location.href = 'login.html';
-}
-
 function logoutEventPage() {
   localStorage.removeItem('token');
   localStorage.removeItem('currentUser');
   window.location.href = 'login.html';
 }
-
-document.getElementById('logoutLink').addEventListener('click', event => {
-  event.preventDefault();
-  logoutEventPage();
-});
 
 async function apiRequest(path, method = 'GET', body) {
   const headers = { Authorization: 'Bearer ' + token };
@@ -55,6 +46,7 @@ async function apiRequest(path, method = 'GET', body) {
 }
 
 const el = id => document.getElementById(id);
+let eventPhotoPreviewUrl = null;
 
 function addText(parent, tag, className, text) {
   const node = document.createElement(tag);
@@ -169,7 +161,7 @@ function renderEvent(event) {
   footer.className = 'event-footer';
   addText(footer, 'span', '', `Hosted by ${event.organizer || 'Campus Loop'}`);
 
-  if (currentUser.role === 'admin') {
+  if (currentUser.role === 'admin' || event.organizerId === currentUser.id) {
     const remove = document.createElement('button');
     remove.type = 'button';
     remove.className = 'delete-btn';
@@ -218,8 +210,8 @@ async function loadEvents() {
 async function addEvent(event) {
   event.preventDefault();
 
-  if (currentUser.role !== 'admin') {
-    alert('Only an admin can publish events.');
+  if (!['admin', 'instructor'].includes(currentUser.role)) {
+    el('formMessage').textContent = 'Only instructors and admins can publish events.';
     return;
   }
 
@@ -230,6 +222,10 @@ async function addEvent(event) {
 
   if (photo && photo.size > 5 * 1024 * 1024) {
     message.textContent = 'The photo must be 5 MB or smaller.';
+    return;
+  }
+  if (photo && !['image/jpeg', 'image/png', 'image/webp', 'image/gif'].includes(photo.type)) {
+    message.textContent = 'Choose a JPG, PNG, WEBP, or GIF image.';
     return;
   }
 
@@ -248,6 +244,7 @@ async function addEvent(event) {
   try {
     await apiRequest('/events', 'POST', formData);
     form.reset();
+    updateEventPhotoPreview();
     message.textContent = 'Event published successfully.';
     await loadEvents();
   } catch (error) {
@@ -257,11 +254,46 @@ async function addEvent(event) {
   }
 }
 
-const eventForm = el('eventForm');
+function updateEventPhotoPreview() {
+  if (eventPhotoPreviewUrl) URL.revokeObjectURL(eventPhotoPreviewUrl);
 
-if (currentUser && currentUser.role === 'admin') {
-  el('adminPanel').hidden = false;
-  eventForm.addEventListener('submit', addEvent);
+  const photo = el('eventPhoto').files[0];
+  const preview = el('eventPhotoPreview');
+  const image = el('eventPhotoPreviewImage');
+  if (!photo) {
+    image.removeAttribute('src');
+    preview.hidden = true;
+    eventPhotoPreviewUrl = null;
+    return;
+  }
+
+  eventPhotoPreviewUrl = URL.createObjectURL(photo);
+  image.src = eventPhotoPreviewUrl;
+  preview.hidden = false;
 }
 
-loadEvents();
+function initializeEvents() {
+  if (!token || !currentUser) {
+    window.location.replace('login.html');
+    return;
+  }
+
+  el('logoutLink').addEventListener('click', event => {
+    event.preventDefault();
+    logoutEventPage();
+  });
+
+  if (['admin', 'instructor'].includes(currentUser.role)) {
+    el('adminPanel').hidden = false;
+    el('eventForm').addEventListener('submit', addEvent);
+    el('eventPhoto').addEventListener('change', updateEventPhotoPreview);
+    el('removeEventPhoto').addEventListener('click', () => {
+      el('eventPhoto').value = '';
+      updateEventPhotoPreview();
+    });
+  }
+
+  loadEvents();
+}
+
+initializeEvents();

@@ -21,14 +21,59 @@
     <div class="nav-links">
       <a href="index.html" class="active" aria-current="page">Home</a>
       <a href="feed.html">Feed</a>
-      <a href="attendance.html">Attendance</a>
       <a href="events.html">Events</a>
-      <a href="mcq.html">MCQ Maker</a>
-      <a href="ai-chat.html">AI Chat</a>
-      <a href="resume.html">Resume Builder</a>
+    </div>
+    <div class="home-nav-actions">
       <a href="login.html" id="homeAccountLink" class="nav-login">Login <span>↗</span></a>
+      <button id="homeToolsButton" class="home-tools-button" type="button"
+        aria-label="Open campus tools" aria-haspopup="dialog" aria-controls="homeToolsDialog">
+        <span></span><span></span><span></span>
+      </button>
     </div>
   </nav>
+
+  <dialog id="homeToolsDialog" class="home-tools-dialog" aria-labelledby="homeToolsTitle">
+    <div class="home-tools-heading">
+      <div>
+        <p class="home-tools-eyebrow">CAMPUS LOOP</p>
+        <h2 id="homeToolsTitle">Your campus tools</h2>
+      </div>
+      <button id="closeHomeTools" class="home-tools-close" type="button" aria-label="Close campus tools">×</button>
+    </div>
+    <p class="home-tools-description">Everything you need to connect, learn and stay on track.</p>
+    <nav class="home-tools-list" aria-label="Campus tools">
+      <a href="ai-chat.html">
+        <span class="home-tool-icon tool-ai" aria-hidden="true">✦</span>
+        <span><strong>AI Assistant</strong><small>Get help with learning and study plans</small></span>
+        <span class="home-tool-arrow" aria-hidden="true">↗</span>
+      </a>
+      <a href="mcq.html">
+        <span class="home-tool-icon tool-mcq" aria-hidden="true">Q</span>
+        <span><strong>MCQ Maker</strong><small>Turn study PDFs into practice quizzes</small></span>
+        <span class="home-tool-arrow" aria-hidden="true">↗</span>
+      </a>
+      <a href="feed.html">
+        <span class="home-tool-icon tool-feed" aria-hidden="true">↗</span>
+        <span><strong>Student Feed</strong><small>Share updates with your campus community</small></span>
+        <span class="home-tool-arrow" aria-hidden="true">↗</span>
+      </a>
+      <a href="attendance.html">
+        <span class="home-tool-icon tool-attendance" aria-hidden="true">✓</span>
+        <span><strong>Attendance</strong><small>Keep class attendance in view</small></span>
+        <span class="home-tool-arrow" aria-hidden="true">↗</span>
+      </a>
+      <a href="events.html">
+        <span class="home-tool-icon tool-events" aria-hidden="true">▦</span>
+        <span><strong>Campus Events</strong><small>Discover workshops and activities</small></span>
+        <span class="home-tool-arrow" aria-hidden="true">↗</span>
+      </a>
+      <a href="resume.html">
+        <span class="home-tool-icon tool-resume" aria-hidden="true">CV</span>
+        <span><strong>Resume Builder</strong><small>Prepare a resume for your next opportunity</small></span>
+        <span class="home-tool-arrow" aria-hidden="true">↗</span>
+      </a>
+    </nav>
+  </dialog>
 
   <main>
 
@@ -79,39 +124,52 @@
             <span class="visual-live">● LIVE YOUR WAY</span>
           </div>
 
-          <div class="campus-art" aria-label="Illustration of students learning together">
-            <div class="art-orbit orbit-one"></div>
-            <div class="art-orbit orbit-two"></div>
-            <div class="art-sun"></div>
-
-            <div class="art-building">
-              <div class="building-roof"></div>
-              <div class="building-windows">
-                <i></i><i></i><i></i>
-                <i></i><i></i><i></i>
-                <i></i><i></i><i></i>
+          <div class="campus-dashboard-preview" aria-label="Campus Loop tools preview">
+            <div class="dashboard-preview-sidebar" aria-hidden="true">
+              <span class="preview-brand-mark">C</span>
+              <span class="preview-nav-mark active"></span>
+              <span class="preview-nav-mark"></span>
+              <span class="preview-nav-mark"></span>
+              <span class="preview-nav-mark"></span>
+            </div>
+            <div class="dashboard-preview-content">
+              <div class="preview-welcome">
+                <span>YOUR CAMPUS, CONNECTED</span>
+                <strong>Make space for what matters.</strong>
+                <small>Learning, community and campus life — together.</small>
               </div>
-              <div class="building-door"></div>
+              <div class="preview-tool-grid">
+                <a href="ai-chat.html" class="preview-tool-card preview-tool-ai">
+                  <span class="preview-tool-symbol">✦</span>
+                  <strong>AI study companion</strong>
+                  <small>Learn something new</small>
+                  <span class="preview-tool-open">↗</span>
+                </a>
+                <a href="feed.html" class="preview-tool-card preview-tool-feed">
+                  <span class="preview-tool-symbol">↗</span>
+                  <strong>Campus community</strong>
+                  <small>Catch up with your peers</small>
+                  <span class="preview-tool-open">↗</span>
+                </a>
+                <a href="mcq.html" class="preview-tool-card preview-tool-mcq">
+                  <span class="preview-tool-symbol">Q</span>
+                  <strong>Practice smarter</strong>
+                  <small>Create a quiz from your notes</small>
+                  <span class="preview-tool-open">↗</span>
+                </a>
+                <a href="attendance.html" class="preview-tool-card preview-tool-attendance">
+                  <span class="preview-tool-symbol">✓</span>
+                  <strong>Stay on track</strong>
+                  <small>Review your attendance</small>
+                  <span class="preview-tool-open">↗</span>
+                </a>
+              </div>
+              <a href="events.html" class="preview-event-link">
+                <span class="preview-event-icon">▦</span>
+                <span><strong>Find your next campus event</strong><small>Explore events and activities</small></span>
+                <span class="preview-tool-open">↗</span>
+              </a>
             </div>
-
-            <div class="art-person person-one">
-              <span class="person-head"></span>
-              <span class="person-body"></span>
-            </div>
-
-            <div class="art-person person-two">
-              <span class="person-head"></span>
-              <span class="person-body"></span>
-            </div>
-
-            <div class="art-person person-three">
-              <span class="person-head"></span>
-              <span class="person-body"></span>
-            </div>
-
-            <div class="art-laptop"></div>
-            <span class="art-star star-one">✦</span>
-            <span class="art-star star-two">✧</span>
           </div>
 
           <div class="visual-bottom">
@@ -142,7 +200,7 @@
 
     </section>
 
-    <!-- Quick Access / Campus Toolkit -->
+    <!-- Campus Toolkit -->
     <section class="home-section quick-section">
 
       <div class="section-heading-home">
@@ -156,140 +214,11 @@
             <span class="gradient-text">in one place.</span>
           </h2>
 
-          <p>
-            Less hassle, more campus life. Find your next step below.
-          </p>
+          <p>Open your tools whenever you need a hand with learning or campus life.</p>
         </div>
-      </div>
-
-      <div class="home-feature-grid">
-
-        <!-- AI Assistant -->
-        <a href="ai-chat.html" class="home-feature feature-purple">
-          <div class="feature-top">
-            <span class="feature-icon">✦</span>
-            <span class="feature-arrow">↗</span>
-          </div>
-
-          <h3>AI Assistant</h3>
-
-          <p>
-            Get help understanding concepts, planning study sessions
-            and working through tough questions.
-          </p>
-
-          <span class="feature-link">
-            Ask Campus Loop AI <span>→</span>
-          </span>
-
-          <span class="feature-watermark">✦</span>
-        </a>
-
-        <!-- Student Feed -->
-        <a href="feed.html" class="home-feature feature-purple">
-          <div class="feature-top">
-            <span class="feature-icon">♧</span>
-            <span class="feature-arrow">↗</span>
-          </div>
-
-          <h3>Student Feed</h3>
-
-          <p>
-            Share updates, ask questions and stay in the loop
-            with your classmates.
-          </p>
-
-          <span class="feature-link">
-            Explore feed <span>→</span>
-          </span>
-
-          <span class="feature-watermark">✉</span>
-        </a>
-
-        <!-- Campus Events -->
-        <a href="events.html" class="home-feature feature-blue">
-          <div class="feature-top">
-            <span class="feature-icon">▦</span>
-            <span class="feature-arrow">↗</span>
-          </div>
-
-          <h3>Campus Events</h3>
-
-          <p>
-            Find workshops, competitions, seminars and activities
-            around campus.
-          </p>
-
-          <span class="feature-link">
-            Find events <span>→</span>
-          </span>
-
-          <span class="feature-watermark">▦</span>
-        </a>
-
-        <!-- Attendance -->
-        <a href="attendance.html" class="home-feature feature-teal">
-          <div class="feature-top">
-            <span class="feature-icon">✓</span>
-            <span class="feature-arrow">↗</span>
-          </div>
-
-          <h3>Attendance</h3>
-
-          <p>
-            Keep track of class attendance and stay organized
-            throughout the semester.
-          </p>
-
-          <span class="feature-link">
-            View attendance <span>→</span>
-          </span>
-
-          <span class="feature-watermark">✓</span>
-        </a>
-
-        <!-- MCQ Maker -->
-        <a href="mcq.html" class="home-feature feature-orange">
-          <div class="feature-top">
-            <span class="feature-icon">✳</span>
-            <span class="feature-arrow">↗</span>
-          </div>
-
-          <h3>MCQ Maker</h3>
-
-          <p>
-            Turn your study material into practice questions
-            and prepare smarter.
-          </p>
-
-          <span class="feature-link">
-            Start learning <span>→</span>
-          </span>
-
-          <span class="feature-watermark">✳</span>
-        </a>
-
-        <!-- NEW: Resume Builder -->
-        <a href="resume.html" class="home-feature feature-purple">
-          <div class="feature-top">
-            <span class="feature-icon">📄</span>
-            <span class="feature-arrow">↗</span>
-          </div>
-
-          <h3>Resume Builder</h3>
-
-          <p>
-            Create a professional resume for internships,
-            projects and placement opportunities.
-          </p>
-
-          <span class="feature-link">
-            Build your resume <span>→</span>
-          </span>
-
-          <span class="feature-watermark">✦</span>
-        </a>
-
+        <button class="home-btn secondary-btn toolkit-open-button" type="button" data-open-home-tools>
+          Browse campus tools <span>↗</span>
+        </button>
       </div>
     </section>
 

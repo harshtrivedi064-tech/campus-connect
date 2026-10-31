@@ -35,7 +35,7 @@
     <section class="admin-event-panel" id="adminPanel" hidden>
       <div class="section-heading">
         <div>
-          <p class="eyebrow">ADMIN WORKSPACE</p>
+          <p class="eyebrow">EVENT ORGANIZER WORKSPACE</p>
           <h2>Create a campus event</h2>
           <p>Add the details and a photo for students to discover.</p>
         </div>
@@ -71,6 +71,10 @@
           Event photo (JPG, PNG, WEBP or GIF; max 5 MB)
           <input id="eventPhoto" name="photo" type="file" accept="image/jpeg,image/png,image/webp,image/gif">
         </label>
+        <div id="eventPhotoPreview" class="event-photo-preview" hidden>
+          <img id="eventPhotoPreviewImage" alt="Selected event photo preview">
+          <button id="removeEventPhoto" class="event-photo-remove" type="button">Remove photo</button>
+        </div>
 
         <button type="submit" id="addEventButton">Publish event</button>
         <p id="formMessage" class="form-message" role="status"></p>

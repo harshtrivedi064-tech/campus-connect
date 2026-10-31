@@ -96,6 +96,15 @@ const authLimiter = rateLimit({
 
 // ---------- Serve the frontend and API ----------
 app.use(express.static(rootDir, { index: ['index.html'] }));
+app.use('/uploads/events', express.static(path.join(__dirname, 'uploads', 'events'), {
+  dotfiles: 'deny',
+  immutable: true,
+  maxAge: '1d',
+  setHeaders: res => {
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.setHeader('Content-Security-Policy', "default-src 'none'; sandbox");
+  }
+}));
 
 app.get('/', (req, res) => {
   res.sendFile(path.join(rootDir, 'index.html'));
