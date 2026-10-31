@@ -149,17 +149,91 @@
         }
 
         .mcq-file {
-            display: block;
-            width: 100%;
-            padding: 20px 14px;
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            clip-path: inset(50%);
+        }
+
+        .mcq-upload-zone {
+            display: grid;
+            min-height: 135px;
+            place-content: center;
+            gap: 7px;
+            padding: 18px;
             border: 1px dashed #8b80c9;
             border-radius: 13px;
             background: #8b5cf60a;
             color: #bfc8de;
-            font-size: 13px;
+            text-align: center;
+            cursor: pointer;
+            transition: border-color .2s, background .2s;
+        }
+
+        .mcq-upload-zone:hover,
+        .mcq-upload-zone.dragging,
+        .mcq-upload-zone:focus-within {
+            border-color: #b8a3ff;
+            background: #8b5cf61b;
+        }
+
+        .mcq-upload-icon {
+            color: #c4b5fd;
+            font-size: 25px;
+        }
+
+        .mcq-file-name {
+            color: #c4b5fd;
+            font-size: 12px;
+            overflow-wrap: anywhere;
+        }
+
+        .mcq-remove-file {
+            margin-top: 8px;
+            padding: 6px 9px;
+            border: 1px solid #ffffff20;
+            border-radius: 8px;
+            background: #ffffff08;
+            color: #dce2f3;
+            cursor: pointer;
+        }
+
+        .mcq-logout {
+            text-decoration: none;
+        }
+
+        .mcq-select:focus-visible,
+        .mcq-generate:focus-visible,
+        .mcq-option:focus-visible,
+        .mcq-logout:focus-visible,
+        .mcq-control:focus-visible,
+        .mcq-remove-file:focus-visible {
+            outline: 3px solid #a78bfa;
+            outline-offset: 3px;
+        }
+
+        .mcq-status.error {
+            color: #fda4af;
+        }
+
+        .mcq-status.success {
+            color: #6ee7b7;
         }
 
         .mcq-select {
+            width: 100%;
+            padding: 13px;
+            border: 1px solid #ffffff1d;
+            border-radius: 11px;
+            outline: none;
+            background: #0c1224;
+            color: #f1f5f9;
+        }
+
+        .mcq-topic-input {
             width: 100%;
             padding: 13px;
             border: 1px solid #ffffff1d;
@@ -305,6 +379,12 @@
             background: #8b5cf615;
         }
 
+        .mcq-option.selected {
+            border-color: #a78bfa;
+            background: #8b5cf629;
+            color: #f1eaff;
+        }
+
         .mcq-option.correct {
             border-color: #34d399;
             background: #10b98118;
@@ -323,7 +403,7 @@
         }
 
         .mcq-score {
-            display: none;
+            display: block;
             margin: 18px 0 0;
             padding: 15px;
             border: 1px solid #a78bfa35;
@@ -333,6 +413,87 @@
             font-size: 14px;
             font-weight: 700;
             line-height: 1.7;
+        }
+
+        .mcq-progress {
+            margin: 0 0 15px;
+            color: #aeb9d1;
+            font-size: 12px;
+        }
+
+        .mcq-progress progress {
+            width: 100%;
+            height: 8px;
+            margin-top: 8px;
+            appearance: none;
+            border: 0;
+            border-radius: 99px;
+            background: #ffffff14;
+        }
+
+        .mcq-progress progress::-webkit-progress-bar {
+            border-radius: 99px;
+            background: #ffffff14;
+        }
+
+        .mcq-progress progress::-webkit-progress-value {
+            border-radius: 99px;
+            background: linear-gradient(90deg, #8b5cf6, #4f46e5);
+        }
+
+        .mcq-progress progress::-moz-progress-bar {
+            border-radius: 99px;
+            background: linear-gradient(90deg, #8b5cf6, #4f46e5);
+        }
+
+        .mcq-quiz-controls,
+        .mcq-step-controls {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-top: 16px;
+        }
+
+        .mcq-step-controls[hidden],
+        .mcq-quiz-controls[hidden] {
+            display: none;
+        }
+
+        .mcq-control {
+            padding: 10px 13px;
+            border: 1px solid #ffffff20;
+            border-radius: 9px;
+            background: #ffffff08;
+            color: #e2e8f0;
+            font-weight: 650;
+            cursor: pointer;
+        }
+
+        .mcq-control.primary {
+            border-color: transparent;
+            background: linear-gradient(110deg, #7c3aed, #4f46e5);
+            color: white;
+        }
+
+        .mcq-control:disabled {
+            opacity: .5;
+            cursor: not-allowed;
+        }
+
+        .mcq-result-detail {
+            display: block;
+            margin-top: 4px;
+            color: #c4b5fd;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .mcq-answer-feedback {
+            margin: 12px 0 0;
+            color: #aeb9d1;
+            font-size: 13px;
         }
 
         .mcq-footer {
@@ -395,8 +556,10 @@
             <a href="feed.html">Feed</a>
             <a href="attendance.html">Attendance</a>
             <a href="events.html">Events</a>
-            <a href="mcq.html" class="active">MCQ Maker</a>
-            <button class="mcq-logout" onclick="logout()">Logout</button>
+            <a href="mcq.html" class="active" aria-current="page">MCQ Maker</a>
+            <a href="ai-chat.html">AI Chat</a>
+            <a href="resume.html">Resume Builder</a>
+            <a href="#" class="mcq-logout" id="mcqLogout">Logout</a>
         </nav>
     </header>
 
@@ -404,19 +567,26 @@
         <section class="mcq-hero">
             <span class="mcq-tag">✦ Smart Study Tool</span>
             <h1>Turn your PDFs into<br><span class="mcq-gradient">practice questions.</span></h1>
-            <p>Upload your study notes and generate multiple-choice questions to test your understanding, one question
-                at a time.</p>
+            <p>Upload your study notes and build a practice quiz. Choose a full question list or work through it one
+                question at a time.</p>
         </section>
 
         <section class="mcq-layout">
             <div class="mcq-panel">
                 <h2>Create your quiz</h2>
                 <p class="mcq-muted">Choose your study material and the number of questions.</p>
+                <p class="mcq-muted">When Gemini is configured, extracted text is sent to Google for question generation. Without a Gemini key, questions are created locally; topic and difficulty settings require Gemini.</p>
 
                 <form id="mcqForm">
                     <label class="mcq-label" for="pdfFile">Upload PDF</label>
-                    <input class="mcq-file" type="file" id="pdfFile" accept=".pdf,application/pdf" required>
-                    <p class="mcq-muted" style="margin: 9px 0 0;">PDF format · Maximum file size 10 MB</p>
+                    <label id="uploadZone" class="mcq-upload-zone">
+                        <span class="mcq-upload-icon" aria-hidden="true">↑</span>
+                        <strong>Choose a PDF or drop it here</strong>
+                        <span class="mcq-muted" style="margin: 0;">PDF format · Maximum file size 10 MB</span>
+                        <span id="fileName" class="mcq-file-name">No file selected</span>
+                        <input class="mcq-file" type="file" id="pdfFile" accept=".pdf,application/pdf" required>
+                    </label>
+                    <button id="removeFile" class="mcq-remove-file" type="button" hidden>Remove file</button>
 
                     <label class="mcq-label" for="qCount">Number of questions</label>
                     <select class="mcq-select" id="qCount">
@@ -426,6 +596,24 @@
                         <option value="20">20 questions</option>
                     </select>
 
+                    <label class="mcq-label" for="topic">Topic or subject (optional)</label>
+                    <input class="mcq-topic-input" id="topic" type="text" maxlength="100"
+                        placeholder="e.g. data structures">
+
+                    <label class="mcq-label" for="difficulty">Difficulty</label>
+                    <select class="mcq-select" id="difficulty">
+                        <option value="balanced">All levels</option>
+                        <option value="easy">Easy</option>
+                        <option value="medium">Medium</option>
+                        <option value="hard">Hard</option>
+                    </select>
+
+                    <label class="mcq-label" for="quizMode">Quiz layout</label>
+                    <select class="mcq-select" id="quizMode">
+                        <option value="all">All questions</option>
+                        <option value="single">One question at a time</option>
+                    </select>
+
                     <button class="mcq-generate" id="generateBtn" type="submit">✦ Generate MCQs</button>
                 </form>
 
@@ -433,7 +621,7 @@
 
                 <div class="mcq-tip">
                     <strong>💡 Study tip</strong><br>
-                    Try answering each question before moving on. Your score updates as you go.
+                    Choose your answers first. Correct answers and your score are revealed when you submit.
                 </div>
             </div>
 
@@ -449,7 +637,20 @@
                     <p>Upload a PDF, choose a question count and click Generate MCQs to begin.</p>
                 </div>
 
+                <div id="quizProgress" class="mcq-progress" hidden>
+                    <span id="progressLabel"></span>
+                    <progress id="progressBar" value="0" max="1"></progress>
+                </div>
                 <div id="quiz"></div>
+                <div id="quizControls" class="mcq-quiz-controls" hidden>
+                    <div id="stepControls" class="mcq-step-controls" hidden>
+                        <button id="previousQuestion" class="mcq-control" type="button">← Previous</button>
+                        <span id="questionPosition" class="mcq-muted"></span>
+                        <button id="nextQuestion" class="mcq-control" type="button">Next →</button>
+                    </div>
+                    <button id="submitQuiz" class="mcq-control primary" type="button">Submit quiz</button>
+                    <button id="restartQuiz" class="mcq-control" type="button" hidden>Restart quiz</button>
+                </div>
                 <div class="mcq-score" id="scoreBar" role="status" aria-live="polite"></div>
             </div>
         </section>
@@ -458,41 +659,6 @@
     </main>
 
     <script src="js/mcq.js"></script>
-    <script>
-        document.getElementById('mcqForm').addEventListener('submit', function (event) {
-            event.preventDefault();
-            generate();
-        });
-
-        const originalRenderQuiz = renderQuiz;
-        renderQuiz = function () {
-            originalRenderQuiz();
-            document.querySelectorAll('#quiz .q-card').forEach(function (card, index) {
-                card.classList.add('mcq-q-card');
-
-                const title = card.querySelector('.q-text');
-                if (title) {
-                    title.classList.add('mcq-q-text');
-                    const text = title.textContent;
-                    const dot = text.indexOf('. ');
-                    if (dot !== -1) {
-                        const number = document.createElement('div');
-                        number.className = 'mcq-q-number';
-                        number.textContent = 'Question ' + (index + 1);
-                        title.textContent = text.slice(dot + 2);
-                        card.insertBefore(number, title);
-                    }
-                }
-
-                card.querySelectorAll('.option-btn').forEach(function (btn) {
-                    btn.classList.add('mcq-option');
-                });
-            });
-
-            const empty = document.getElementById('emptyState');
-            if (empty) empty.style.display = questions.length ? 'none' : 'block';
-        };
-    </script>
 </body>
 
 </html>

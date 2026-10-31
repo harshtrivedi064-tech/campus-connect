@@ -2077,6 +2077,13 @@ button:disabled {
 
 /* Hero */
 
+.home-page .dashboard-greeting {
+    margin: 0 0 14px;
+    color: #d7c8ff;
+    font-size: 15px;
+    font-weight: 700;
+}
+
 .home-page .home-hero {
     width: min(1200px, 87%);
     min-height: 510px;

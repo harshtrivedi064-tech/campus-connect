@@ -242,9 +242,15 @@
         }
 
         .feed-side-item {
+            display: block;
             padding: 13px 0;
             border-bottom: 1px solid #ffffff12;
             color: #d6dcf0;
+            text-decoration: none;
+        }
+
+        .feed-side-item:hover {
+            color: #c4b5fd;
         }
 
         .feed-side-item:last-child {
@@ -302,11 +308,12 @@
 
         <div class="nav-links">
             <a href="index.html">Home</a>
-            <a href="feed.html" class="active">Feed</a>
+            <a href="feed.html" class="active" aria-current="page">Feed</a>
             <a href="attendance.html">Attendance</a>
             <a href="events.html">Events</a>
             <a href="mcq.html">MCQ Maker</a>
             <a href="ai-chat.html">AI Chat</a>
+            <a href="resume.html">Resume Builder</a>
             <a href="#" onclick="logout(); return false;">Logout</a>
         </div>
     </nav>
@@ -338,7 +345,7 @@
                 <div class="feed-card">
                     <h2>Latest updates</h2>
                     <p class="feed-muted">
-                        Your campus posts will appear here.
+                        Posts shared by your campus community appear here.
                     </p>
                     <div class="feed-toolbar">
                         <input id="feedSearch" type="search" placeholder="Search posts or authors"
@@ -351,7 +358,7 @@
                     <p id="feedResultCount" class="feed-muted" aria-live="polite"></p>
                     <div id="quickFeedPosts">
                         <p class="feed-muted">
-                            Connect this section to your existing feed system to display posts.
+                            Loading campus posts...
                         </p>
                     </div>
                 </div>
@@ -360,9 +367,10 @@
             <aside>
                 <div class="feed-card">
                     <h2>Campus shortcuts</h2>
-                    <div class="feed-side-item">📅 Events and activities</div>
-                    <div class="feed-side-item">📊 Attendance tracker</div>
-                    <div class="feed-side-item">📝 MCQ Maker</div>
+                    <a class="feed-side-item" href="events.html">Events and activities</a>
+                    <a class="feed-side-item" href="attendance.html">Attendance tracker</a>
+                    <a class="feed-side-item" href="mcq.html">MCQ Maker</a>
+                    <a class="feed-side-item" href="ai-chat.html">AI Assistant</a>
                 </div>
 
                 <div class="feed-card">

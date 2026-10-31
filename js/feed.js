@@ -126,12 +126,19 @@ async function loadPosts() {
     document.getElementById('feedResultCount').textContent = '';
 
     try {
-        allFeedPosts = await apiRequest('/posts');
+        const posts = await apiRequest('/posts');
+        if (!Array.isArray(posts)) {
+            throw new Error('The server returned an invalid posts response.');
+        }
+        allFeedPosts = posts;
         renderFeedPosts();
     } catch (error) {
         allFeedPosts = [];
         list.replaceChildren();
         addFeedText(list, 'p', 'feed-muted', error.message);
+        const retry = addFeedText(list, 'button', 'feed-button', 'Try again');
+        retry.type = 'button';
+        retry.addEventListener('click', loadPosts);
         document.getElementById('feedResultCount').textContent = '';
     }
 }

@@ -19,14 +19,14 @@
     </a>
 
     <div class="nav-links">
-      <a href="index.html" class="active">Home</a>
+      <a href="index.html" class="active" aria-current="page">Home</a>
       <a href="feed.html">Feed</a>
       <a href="attendance.html">Attendance</a>
       <a href="events.html">Events</a>
       <a href="mcq.html">MCQ Maker</a>
       <a href="ai-chat.html">AI Chat</a>
       <a href="resume.html">Resume Builder</a>
-      <a href="login.html" class="nav-login">Login <span>↗</span></a>
+      <a href="login.html" id="homeAccountLink" class="nav-login">Login <span>↗</span></a>
     </div>
   </nav>
 
@@ -36,6 +36,7 @@
     <section class="home-hero">
 
       <div class="hero-copy">
+        <p id="dashboardGreeting" class="dashboard-greeting" hidden></p>
         <div class="hero-badge">
           <span class="status-dot"></span>
           CONNECT · LEARN · GROW
@@ -162,6 +163,27 @@
       </div>
 
       <div class="home-feature-grid">
+
+        <!-- AI Assistant -->
+        <a href="ai-chat.html" class="home-feature feature-purple">
+          <div class="feature-top">
+            <span class="feature-icon">✦</span>
+            <span class="feature-arrow">↗</span>
+          </div>
+
+          <h3>AI Assistant</h3>
+
+          <p>
+            Get help understanding concepts, planning study sessions
+            and working through tough questions.
+          </p>
+
+          <span class="feature-link">
+            Ask Campus Loop AI <span>→</span>
+          </span>
+
+          <span class="feature-watermark">✦</span>
+        </a>
 
         <!-- Student Feed -->
         <a href="feed.html" class="home-feature feature-purple">
@@ -350,6 +372,7 @@
 
   </footer>
 
+  <script src="js/home.js"></script>
 </body>
 
 </html>

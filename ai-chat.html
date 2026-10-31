@@ -139,7 +139,6 @@
             color: #e8ebf8;
             line-height: 1.7;
             overflow-wrap: anywhere;
-            white-space: pre-wrap;
         }
 
         .ai-message.assistant {
@@ -151,6 +150,147 @@
             align-self: flex-end;
             border-color: #7862d766;
             background: #6d54d52b;
+            white-space: pre-wrap;
+        }
+
+        .ai-message-content > :first-child {
+            margin-top: 0;
+        }
+
+        .ai-message-content > :last-child {
+            margin-bottom: 0;
+        }
+
+        .ai-message-content h2,
+        .ai-message-content h3,
+        .ai-message-content h4 {
+            margin: 18px 0 8px;
+            color: #f5f6ff;
+            line-height: 1.35;
+        }
+
+        .ai-message-content h2 {
+            font-size: 19px;
+        }
+
+        .ai-message-content h3 {
+            font-size: 16px;
+        }
+
+        .ai-message-content h4 {
+            font-size: 14px;
+        }
+
+        .ai-message-content p,
+        .ai-message-content ul,
+        .ai-message-content ol,
+        .ai-message-content blockquote {
+            margin: 0 0 12px;
+        }
+
+        .ai-message-content a {
+            color: #b8a3ff;
+            text-decoration: underline;
+            text-underline-offset: 2px;
+        }
+
+        .ai-message-content ul,
+        .ai-message-content ol {
+            padding-left: 23px;
+        }
+
+        .ai-message-content li + li {
+            margin-top: 5px;
+        }
+
+        .ai-message-content blockquote {
+            padding: 8px 12px;
+            border-left: 3px solid #9b87ff;
+            color: #c9cde0;
+            background: #ffffff08;
+        }
+
+        .ai-message-content :not(pre) > code {
+            padding: 2px 5px;
+            border: 1px solid #ffffff16;
+            border-radius: 5px;
+            background: #080f25;
+            color: #d7c8ff;
+            font-family: Consolas, "Courier New", monospace;
+            font-size: .92em;
+        }
+
+        .ai-code-block {
+            position: relative;
+            margin: 12px 0;
+            overflow: hidden;
+            border: 1px solid #ffffff18;
+            border-radius: 10px;
+            background: #080f25;
+        }
+
+        .ai-code-block pre {
+            max-width: 100%;
+            margin: 0;
+            overflow-x: auto;
+            padding: 16px;
+            color: #e2e8f0;
+            font: 13px/1.65 Consolas, "Courier New", monospace;
+            tab-size: 4;
+        }
+
+        .ai-table-wrap {
+            max-width: 100%;
+            margin: 12px 0;
+            overflow-x: auto;
+        }
+
+        .ai-table-wrap table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        .ai-table-wrap th,
+        .ai-table-wrap td {
+            padding: 8px 10px;
+            border: 1px solid #ffffff20;
+            text-align: left;
+            vertical-align: top;
+        }
+
+        .ai-table-wrap th {
+            background: #ffffff0d;
+        }
+
+        .ai-message-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .ai-message-action,
+        .ai-retry-button {
+            padding: 6px 9px;
+            border: 1px solid #ffffff20;
+            border-radius: 7px;
+            background: #ffffff08;
+            color: #cdd4e9;
+            font: inherit;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .ai-message-action:hover,
+        .ai-retry-button:hover {
+            border-color: #9b87ff;
+            color: white;
+        }
+
+        .ai-message-action:disabled {
+            opacity: .6;
+            cursor: wait;
         }
 
         .ai-suggestions {
@@ -277,6 +417,7 @@
             <a href="events.html">Events</a>
             <a href="mcq.html">MCQ Maker</a>
             <a href="ai-chat.html" class="active" aria-current="page">AI Chat</a>
+            <a href="resume.html">Resume Builder</a>
             <a href="#" id="aiLogout">Logout</a>
         </div>
     </nav>
@@ -303,6 +444,12 @@
             <div class="ai-suggestions" aria-label="Suggested questions">
                 <button type="button" data-prompt="Explain a difficult topic in simple steps.">
                     Explain a topic
+                </button>
+                <button type="button" data-prompt="Summarize my study material into key ideas and revision notes.">
+                    Make revision notes
+                </button>
+                <button type="button" data-prompt="Help me debug this code. I will share the code and describe the error.">
+                    Debug code
                 </button>
                 <button type="button" data-prompt="Help me make a focused study plan for this week.">
                     Make a study plan

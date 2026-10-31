@@ -14,3 +14,8 @@ For local development, set `GEMINI_API_KEY` in the terminal before starting
 the backend. Chat messages are sent to Google Gemini and are not persisted by
 Campus Loop. The endpoint requires login and allows up to 10 requests per
 minute per account.
+
+When `GEMINI_API_KEY` is configured, MCQ generation also sends extracted PDF
+text to Gemini and limits each account to 10 generation requests per minute.
+The PDF contents are not persisted by Campus Loop. Without the key, MCQs are
+created locally from extracted PDF text using the built-in question generator.
