@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#101827">
+  <title>Campus Loop | Internship Portal</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body class="internships-page">
+  <nav class="navbar">
+    <h2 class="logo">Campus Loop</h2>
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="feed.html">Feed</a>
+      <a href="attendance.html">Attendance</a>
+      <a href="events.html">Events</a>
+      <a href="internships.html" aria-current="page">Internships</a>
+      <a href="mcq.html">MCQ Maker</a>
+      <a href="ai-chat.html">AI Chat</a>
+      <a href="resume.html">Resume Builder</a>
+      <a href="#" id="logoutLink">Logout</a>
+    </div>
+  </nav>
+
+  <main class="internships-main">
+    <header class="internships-hero">
+      <p class="eyebrow">YOUR NEXT STEP STARTS HERE</p>
+      <h1>Find your <span>opportunity.</span></h1>
+      <p>Explore internships and early-career opportunities shared with your campus community.</p>
+      <div id="internshipSummary" class="internship-summary" aria-live="polite"></div>
+    </header>
+
+    <section id="employerPanel" class="internship-panel" hidden>
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">EMPLOYER WORKSPACE</p>
+          <h2>Share an opportunity</h2>
+          <p>Post a role for students and review incoming applications.</p>
+        </div>
+      </div>
+      <form id="internshipForm" class="internship-form">
+        <div class="form-grid">
+          <label>Role title *
+            <input name="title" type="text" maxlength="100" placeholder="Software Engineering Intern" required>
+          </label>
+          <label>Company *
+            <input name="company" type="text" maxlength="100" placeholder="Company or organization" required>
+          </label>
+          <label>Location *
+            <input name="location" type="text" maxlength="100" placeholder="City, State or Country" required>
+          </label>
+          <label>Opportunity type *
+            <select name="type" required>
+              <option value="Internship">Internship</option>
+              <option value="Co-op">Co-op</option>
+              <option value="Part-time">Part-time</option>
+            </select>
+          </label>
+          <label>Work mode *
+            <select name="workMode" required>
+              <option value="On-site">On-site</option>
+              <option value="Hybrid">Hybrid</option>
+              <option value="Remote">Remote</option>
+            </select>
+          </label>
+          <label>Stipend / compensation
+            <input name="stipend" type="text" maxlength="80" placeholder="e.g. ₹20,000/month or Unpaid">
+          </label>
+          <label>Application deadline *
+            <input name="deadline" type="date" required>
+          </label>
+        </div>
+        <label>Role description *
+          <textarea name="description" rows="4" maxlength="3000"
+            placeholder="Describe the work, responsibilities, and what the intern will learn." required></textarea>
+        </label>
+        <label>Eligibility and requirements
+          <textarea name="eligibility" rows="2" maxlength="1000"
+            placeholder="Preferred year, skills, or other requirements"></textarea>
+        </label>
+        <button id="publishInternshipButton" type="submit">Publish opportunity</button>
+        <p id="internshipFormMessage" class="form-message" role="status"></p>
+      </form>
+    </section>
+
+    <section class="internship-listing-section">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">CAMPUS CAREER BOARD</p>
+          <h2>Open opportunities</h2>
+        </div>
+        <span class="section-note">Your next experience is out there</span>
+      </div>
+      <div class="internship-filters">
+        <label for="internshipSearch">Search roles, companies, or locations
+          <input id="internshipSearch" type="search" placeholder="Try “design” or “remote”">
+        </label>
+        <label for="internshipTypeFilter">Opportunity type
+          <select id="internshipTypeFilter">
+            <option value="all">All types</option>
+            <option value="Internship">Internship</option>
+            <option value="Co-op">Co-op</option>
+            <option value="Part-time">Part-time</option>
+          </select>
+        </label>
+        <button id="clearInternshipFilters" class="internship-filter-reset" type="button">Clear filters</button>
+      </div>
+      <p id="internshipResultCount" class="internship-result-count" aria-live="polite"></p>
+      <div id="internshipList" class="internship-list" aria-live="polite">
+        <p class="muted">Loading opportunities...</p>
+      </div>
+    </section>
+  </main>
+
+  <dialog id="applicationDialog" class="internship-dialog" aria-labelledby="applicationDialogTitle">
+    <form id="applicationForm" class="internship-form">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">STUDENT APPLICATION</p>
+          <h2 id="applicationDialogTitle">Apply for this role</h2>
+        </div>
+        <button class="dialog-close" type="button" data-close-dialog="applicationDialog" aria-label="Close">×</button>
+      </div>
+      <p id="applicationRoleName" class="application-role-name"></p>
+      <label>Introduce yourself *
+        <textarea name="coverLetter" rows="5" maxlength="2000"
+          placeholder="Share why you're interested and what you would bring to the role." required></textarea>
+      </label>
+      <label>Resume link
+        <input name="resumeUrl" type="url" maxlength="500" placeholder="https://...">
+      </label>
+      <p id="applicationFormMessage" class="form-message" role="status"></p>
+      <button id="submitApplicationButton" type="submit">Submit application</button>
+    </form>
+  </dialog>
+
+  <dialog id="applicantsDialog" class="internship-dialog" aria-labelledby="applicantsDialogTitle">
+    <div class="section-heading">
+      <div>
+        <p class="eyebrow">EMPLOYER WORKSPACE</p>
+        <h2 id="applicantsDialogTitle">Applications</h2>
+      </div>
+      <button class="dialog-close" type="button" data-close-dialog="applicantsDialog" aria-label="Close">×</button>
+    </div>
+    <div id="applicantList" class="applicant-list" aria-live="polite"></div>
+  </dialog>
+
+  <footer class="events-footer">Campus Loop · Connect. Discover. Grow.</footer>
+  <script src="js/internships.js"></script>
+</body>
+
+</html>

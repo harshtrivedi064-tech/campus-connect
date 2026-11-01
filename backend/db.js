@@ -10,7 +10,8 @@ const INITIAL_DATA = {
   posts: [],
   attendanceSessions: [],
   attendanceReports: [],
-  events: []
+  events: [],
+  internships: []
 };
 
 if (process.env.NODE_ENV === 'production' && !DATABASE_URL) {
@@ -38,6 +39,7 @@ function normalize(data) {
   data.attendanceSessions = Array.isArray(data.attendanceSessions) ? data.attendanceSessions : [];
   data.attendanceReports = Array.isArray(data.attendanceReports) ? data.attendanceReports : [];
   data.events = Array.isArray(data.events) ? data.events : [];
+  data.internships = Array.isArray(data.internships) ? data.internships : [];
   return data;
 }
 
@@ -78,7 +80,15 @@ async function readFileData() {
     if (error.code !== 'ENOENT') throw error;
     await fs.mkdir(path.dirname(FILE), { recursive: true });
     await fs.writeFile(FILE, JSON.stringify(INITIAL_DATA, null, 2), { flag: 'wx' });
-    return { ...INITIAL_DATA, users: [], posts: [], attendanceSessions: [], events: [] };
+    return {
+      ...INITIAL_DATA,
+      users: [],
+      posts: [],
+      attendanceSessions: [],
+      attendanceReports: [],
+      events: [],
+      internships: []
+    };
   }
 }
 
