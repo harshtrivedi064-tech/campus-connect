@@ -85,10 +85,24 @@
       <div class="section-heading">
         <div>
           <p class="eyebrow">MARK YOUR CALENDAR</p>
-          <h2>Upcoming events</h2>
+          <h2 id="eventsHeading">Upcoming events</h2>
         </div>
         <span class="section-note">Made for campus life</span>
       </div>
+      <div class="event-filters">
+        <label class="event-search-label" for="eventSearch">Find an event
+          <input id="eventSearch" type="search" placeholder="Search title, venue, or host">
+        </label>
+        <label for="eventTimeFilter">Show
+          <select id="eventTimeFilter">
+            <option value="upcoming">Upcoming</option>
+            <option value="all">All events</option>
+            <option value="past">Past events</option>
+          </select>
+        </label>
+        <button id="clearEventFilters" class="event-filter-reset" type="button">Clear filters</button>
+      </div>
+      <p id="eventResultCount" class="event-result-count" aria-live="polite"></p>
       <div id="eventList" class="event-list" aria-live="polite">
         <p class="muted">Loading events...</p>
       </div>

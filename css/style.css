@@ -4214,3 +4214,282 @@ button:disabled {
         font-size: .85rem;
     }
 }
+
+.attendance-correction-form textarea {
+    display: block;
+    width: 100%;
+    min-height: 90px;
+    margin: 8px 0 16px;
+    padding: 13px 14px;
+    border: 1px solid rgba(148, 163, 184, .23);
+    border-radius: 11px;
+    background: #101a33;
+    color: #f4f6ff;
+    font: inherit;
+    resize: vertical;
+}
+
+.attendance-correction-form textarea:focus {
+    outline: 2px solid rgba(167, 139, 250, .6);
+    border-color: #a78bfa;
+}
+
+.attendance-correction-report {
+    display: grid;
+    gap: 9px;
+    padding: 16px;
+    margin-top: 12px;
+    border: 1px solid var(--att-border);
+    border-radius: 13px;
+    background: rgba(8, 15, 37, .35);
+}
+
+.attendance-correction-report > p {
+    margin: 0;
+    color: #dce3f5;
+    line-height: 1.6;
+    overflow-wrap: anywhere;
+}
+
+.attendance-report-email {
+    color: var(--att-muted);
+}
+
+.attendance-report-state {
+    width: fit-content;
+    padding: 6px 9px;
+    border-radius: 8px;
+    background: rgba(251, 191, 36, .12);
+    color: #fde68a;
+    font-size: .8rem;
+    font-weight: 700;
+}
+
+.attendance-report-state.corrected {
+    background: rgba(74, 222, 128, .12);
+    color: #86efac;
+}
+
+.attendance-report-state.rejected {
+    background: rgba(248, 113, 113, .12);
+    color: #fca5a5;
+}
+
+.attendance-report-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 9px;
+    margin-top: 4px;
+}
+
+.attendance-report-actions .attendance-secondary-button {
+    min-height: 42px;
+}
+
+.events-page .events-main {
+    width: min(1120px, 92%);
+    padding-bottom: 48px;
+}
+
+.events-page .events-hero {
+    position: relative;
+    overflow: hidden;
+    padding: clamp(30px, 6vw, 58px);
+    border-color: rgba(167, 139, 250, .25);
+    background:
+        radial-gradient(circle at 90% 15%, rgba(56, 189, 248, .2), transparent 30%),
+        linear-gradient(125deg, #211d4c, #111a36 65%, #10283a);
+}
+
+.events-page .admin-event-panel,
+.events-page .upcoming-section {
+    padding: clamp(20px, 3vw, 30px);
+    border: 1px solid rgba(148, 163, 184, .16);
+    border-radius: 22px;
+    background: rgba(15, 23, 42, .72);
+    box-shadow: 0 18px 55px rgba(0, 0, 0, .16);
+}
+
+.events-page .admin-event-panel {
+    margin-bottom: 28px;
+}
+
+.events-page .admin-event-panel[hidden] {
+    display: none;
+}
+
+.events-page .event-form .form-grid {
+    gap: 16px;
+}
+
+.events-page .event-form label {
+    color: #e2e8f0;
+}
+
+.events-page .event-form input,
+.events-page .event-form textarea,
+.events-page .event-filters input,
+.events-page .event-filters select {
+    border: 1px solid rgba(148, 163, 184, .22);
+    border-radius: 11px;
+    background: #0b1429;
+    color: #f8fafc;
+    font: inherit;
+}
+
+.events-page .event-form input,
+.events-page .event-form textarea {
+    padding: 13px 14px;
+}
+
+.events-page .event-form input:focus,
+.events-page .event-form textarea:focus,
+.events-page .event-filters input:focus,
+.events-page .event-filters select:focus {
+    outline: 2px solid rgba(167, 139, 250, .5);
+    border-color: #a78bfa;
+}
+
+.events-page .event-filters {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 220px auto;
+    align-items: end;
+    gap: 14px;
+    margin: 20px 0 8px;
+}
+
+.events-page .event-filters label {
+    display: grid;
+    gap: 7px;
+    color: #cbd5e1;
+    font-size: .85rem;
+    font-weight: 650;
+}
+
+.events-page .event-filters input,
+.events-page .event-filters select {
+    width: 100%;
+    min-height: 46px;
+    padding: 11px 13px;
+}
+
+.events-page .event-result-count {
+    min-height: 20px;
+    color: #94a3b8;
+    font-size: .84rem;
+}
+
+.events-page .event-filter-reset {
+    min-height: 46px;
+    margin: 0;
+    padding: 10px 14px;
+    border: 1px solid rgba(148, 163, 184, .24);
+    border-radius: 11px;
+    background: rgba(148, 163, 184, .1);
+    color: #e2e8f0;
+    font: inherit;
+    font-size: .85rem;
+    font-weight: 650;
+    cursor: pointer;
+}
+
+.events-page .event-filter-reset:hover {
+    background: rgba(148, 163, 184, .18);
+}
+
+.events-page .event-list {
+    gap: 18px;
+}
+
+.events-page .event-card {
+    min-width: 0;
+    overflow: hidden;
+    border: 1px solid rgba(148, 163, 184, .2);
+    border-radius: 18px;
+    background: linear-gradient(150deg, rgba(30, 41, 72, .9), rgba(13, 22, 43, .95));
+    box-shadow: 0 14px 35px rgba(0, 0, 0, .16);
+}
+
+.events-page .event-card-past {
+    opacity: .8;
+}
+
+.events-page .event-cover {
+    min-height: 170px;
+}
+
+.events-page .event-card-content {
+    min-width: 0;
+    padding: 20px;
+}
+
+.events-page .event-past-badge {
+    display: inline-flex;
+    width: fit-content;
+    padding: 5px 9px;
+    margin-bottom: 8px;
+    border-radius: 999px;
+    background: rgba(148, 163, 184, .15);
+    color: #cbd5e1;
+    font-size: .72rem;
+    font-weight: 750;
+}
+
+.events-page .event-registration-closed {
+    margin: 0 0 18px;
+    color: #94a3b8;
+    font-size: .85rem;
+}
+
+.events-page .event-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 15px;
+}
+
+.events-page .event-meta span,
+.events-page .event-meta time {
+    padding: 6px 9px;
+    border: 1px solid rgba(148, 163, 184, .14);
+    border-radius: 8px;
+    background: rgba(8, 15, 37, .4);
+    color: #cbd5e1;
+    font-size: .8rem;
+}
+
+.events-page .rsvp-actions {
+    flex-wrap: wrap;
+}
+
+.events-page .rsvp-option {
+    min-height: 40px;
+    border-radius: 10px;
+}
+
+.events-page .rsvp-option.active {
+    border-color: #a78bfa;
+    background: rgba(139, 92, 246, .22);
+    color: #ede9fe;
+}
+
+.events-page .delete-btn {
+    border: 1px solid rgba(248, 113, 113, .3);
+    border-radius: 9px;
+    background: rgba(127, 29, 29, .2);
+    color: #fecaca;
+}
+
+@media (max-width: 600px) {
+    .events-page .event-filters {
+        grid-template-columns: 1fr;
+    }
+
+    .events-page .event-filter-reset {
+        justify-self: start;
+    }
+
+    .attendance-report-actions {
+        flex-direction: column;
+    }
+}

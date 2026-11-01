@@ -12,15 +12,17 @@
 
         body {
             margin: 0;
-            font-family: Arial, sans-serif;
-            background: #f1f5f9;
-            color: #1e293b;
+            font-family: Inter, "Segoe UI", Arial, sans-serif;
+            background:
+                radial-gradient(circle at 8% 0%, #e0e7ff, transparent 34rem),
+                #f4f6fb;
+            color: #172033;
         }
 
         header {
-            background: #172554;
+            background: linear-gradient(110deg, #121c43, #263c77);
             color: white;
-            padding: 18px 6%;
+            padding: 18px max(5%, calc((100% - 1320px) / 2));
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -34,13 +36,16 @@
         }
 
         .container {
-            max-width: 1200px;
-            margin: 28px auto;
-            padding: 0 18px;
+            max-width: 1320px;
+            margin: 34px auto;
+            padding: 0 24px;
         }
 
         h1 {
-            margin-bottom: 8px;
+            margin: 0 0 8px;
+            color: #111b39;
+            font-size: clamp(30px, 4vw, 42px);
+            letter-spacing: -1.2px;
         }
 
         .intro {
@@ -50,46 +55,73 @@
 
         .layout {
             display: grid;
-            grid-template-columns: minmax(280px, 1fr) minmax(300px, 1fr);
-            gap: 24px;
+            grid-template-columns: minmax(320px, .85fr) minmax(380px, 1.15fr);
+            gap: 26px;
             align-items: start;
         }
 
         .panel {
             background: white;
-            padding: 22px;
-            border-radius: 14px;
-            box-shadow: 0 4px 18px #0f172a0d;
+            padding: clamp(20px, 3vw, 30px);
+            border: 1px solid #e3e8f2;
+            border-radius: 18px;
+            box-shadow: 0 16px 45px #1725540d;
         }
 
         label {
             display: block;
-            margin: 14px 0 6px;
+            margin: 16px 0 7px;
             font-weight: 600;
             font-size: 14px;
+            color: #34415d;
         }
 
         input,
-        textarea {
+        textarea,
+        select {
             width: 100%;
-            padding: 11px;
-            border: 1px solid #cbd5e1;
-            border-radius: 7px;
+            min-height: 44px;
+            padding: 11px 12px;
+            border: 1px solid #d5dceb;
+            border-radius: 10px;
             font: inherit;
+            color: #1e293b;
+            background: #fbfcff;
+            transition: border-color .2s, box-shadow .2s;
+        }
+
+        input:focus,
+        textarea:focus,
+        select:focus {
+            outline: 0;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px #667eea22;
         }
 
         textarea {
             resize: vertical;
-            min-height: 75px;
+            min-height: 90px;
+            line-height: 1.55;
         }
 
         button {
             border: 0;
-            border-radius: 8px;
+            border-radius: 10px;
             padding: 12px 16px;
             font-weight: bold;
             cursor: pointer;
-            margin: 8px 5px 0 0;
+            margin: 10px 6px 0 0;
+            transition: transform .18s, filter .18s;
+        }
+
+        button:hover {
+            transform: translateY(-1px);
+            filter: brightness(1.05);
+        }
+
+        button:focus-visible {
+            outline: 3px solid #a5b4fc;
+            outline-offset: 3px;
         }
 
         .primary {
@@ -98,30 +130,64 @@
         }
 
         .secondary {
-            background: #e2e8f0;
-            color: #0f172a;
+            background: #eef1f8;
+            color: #293650;
+        }
+
+        .panel-heading {
+            margin-top: 0;
+            color: #172554;
+        }
+
+        .template-choice {
+            padding: 14px;
+            margin: 20px 0 22px;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            background: #f8faff;
+        }
+
+        .template-choice label {
+            margin-top: 0;
+        }
+
+        .draft-status {
+            min-height: 20px;
+            color: #4f46e5;
+            font-size: 13px;
         }
 
         #resume {
             background: white;
-            padding: 30px;
+            padding: clamp(28px, 5vw, 52px);
             min-height: 650px;
             color: #1e293b;
             overflow-wrap: anywhere;
+            border-top: 5px solid #3157b7;
         }
 
         #resume h2 {
             margin: 0;
-            color: #1d4ed8;
-            font-size: 28px;
+            color: #172554;
+            font-size: clamp(28px, 4vw, 38px);
+            letter-spacing: -.8px;
+        }
+
+        #resume .resume-headline {
+            margin: 7px 0 10px;
+            color: #4f46e5;
+            font-size: 15px;
+            font-weight: 650;
         }
 
         #resume h3 {
-            border-bottom: 2px solid #2563eb;
-            padding-bottom: 5px;
-            margin: 23px 0 10px;
+            border-bottom: 1px solid #dce3f2;
+            padding-bottom: 8px;
+            margin: 25px 0 11px;
             font-size: 15px;
             text-transform: uppercase;
+            color: #263d75;
+            letter-spacing: .9px;
         }
 
         #resume p {
@@ -132,6 +198,19 @@
         .contact {
             color: #475569;
             font-size: 13px;
+            line-height: 1.7;
+        }
+
+        #outLinks {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        #outLinks a {
+            color: #3157b7;
+            font-size: 13px;
+            overflow-wrap: anywhere;
         }
 
         .resume-text {
@@ -148,7 +227,42 @@
             }
         }
 
+        #resume.resume-template-classic {
+            border-top-color: #172554;
+            font-family: Georgia, "Times New Roman", serif;
+        }
+
+        #resume.resume-template-classic h3 {
+            border-bottom-color: #172554;
+            color: #172554;
+        }
+
+        #resume.resume-template-modern {
+            border-top-color: #0f766e;
+        }
+
+        #resume.resume-template-modern h3 {
+            border-bottom-color: #99f6e4;
+            color: #0f766e;
+        }
+
+        @media (max-width: 520px) {
+            .container {
+                padding: 0 14px;
+            }
+
+            .actions button {
+                width: 100%;
+                margin-right: 0;
+            }
+        }
+
         @media print {
+            @page {
+                size: A4;
+                margin: 0;
+            }
+
             body {
                 background: white;
             }
@@ -179,6 +293,16 @@
             #resume {
                 padding: 15mm;
                 min-height: auto;
+                border-radius: 0;
+                box-shadow: none;
+                print-color-adjust: exact;
+                -webkit-print-color-adjust: exact;
+            }
+
+            #resume h3,
+            #resume p,
+            #outLinks a {
+                break-inside: avoid;
             }
         }
     </style>
@@ -192,21 +316,33 @@
 
     <main class="container">
         <h1>Resume Builder</h1>
-        <p class="intro">Create a professional resume for internships and placements.</p>
+        <p class="intro">Build a polished, ATS-friendly resume. Your draft is saved in this browser.</p>
 
         <div class="layout">
             <section class="panel form-panel">
-                <h2>Your Details</h2>
+                <h2 class="panel-heading">Your Details</h2>
+                <p class="intro">Add clear, specific details. Use one achievement or project per line.</p>
 
                 <form id="resumeForm">
+                    <div class="template-choice">
+                        <label for="resumeTemplate">Resume style</label>
+                        <select id="resumeTemplate">
+                            <option value="modern">Modern</option>
+                            <option value="classic">Classic</option>
+                        </select>
+                    </div>
+
                     <label for="name">Full Name *</label>
-                    <input id="name" placeholder="Your full name" required>
+                    <input id="name" autocomplete="name" placeholder="Your full name" required>
+
+                    <label for="headline">Target role / headline</label>
+                    <input id="headline" placeholder="Computer Science Student · Frontend Developer">
 
                     <label for="email">Email *</label>
-                    <input id="email" type="email" placeholder="you@example.com" required>
+                    <input id="email" type="email" autocomplete="email" placeholder="you@example.com" required>
 
                     <label for="phone">Phone</label>
-                    <input id="phone" type="tel" placeholder="+91 XXXXX XXXXX">
+                    <input id="phone" type="tel" autocomplete="tel" placeholder="+91 XXXXX XXXXX">
 
                     <label for="location">City</label>
                     <input id="location" placeholder="Kanpur, Uttar Pradesh">
@@ -226,6 +362,10 @@
                     <textarea id="experience"
                         placeholder="Internships, hackathons, clubs, volunteering, or achievements"></textarea>
 
+                    <label for="achievements">Achievements & Certifications</label>
+                    <textarea id="achievements"
+                        placeholder="Scholarships, awards, certifications, competition results"></textarea>
+
                     <label for="summary">Professional Summary</label>
                     <textarea id="summary" placeholder="Write 2–3 lines about your goals and strengths."></textarea>
 
@@ -240,6 +380,7 @@
                         <button type="button" class="secondary" id="saveBtn">Save Draft</button>
                         <button type="button" class="secondary" id="loadBtn">Load Draft</button>
                     </div>
+                    <p id="draftStatus" class="draft-status" role="status" aria-live="polite"></p>
                 </form>
             </section>
 
@@ -247,6 +388,7 @@
                 <h2 class="preview-title">Live Preview</h2>
                 <div class="panel" id="resume">
                     <h2 id="outName">Your Name</h2>
+                    <p class="resume-headline" id="outHeadline"></p>
                     <p class="contact" id="outContact">Email · Phone · City</p>
                     <p class="contact" id="outLinks"></p>
 
@@ -274,6 +416,11 @@
                         <h3>Experience & Activities</h3>
                         <p class="resume-text" id="outExperience">Your experience will appear here.</p>
                     </div>
+
+                    <div id="achievementsSection">
+                        <h3>Achievements & Certifications</h3>
+                        <p class="resume-text" id="outAchievements">Your achievements will appear here.</p>
+                    </div>
                 </div>
 
                 <button type="button" class="primary actions" id="pdfBtn">
@@ -285,86 +432,120 @@
 
     <script>
         const fields = [
-            "name", "email", "phone", "location",
-            "education", "skills", "projects", "experience",
-            "summary", "linkedin", "github"
+            "name", "headline", "email", "phone", "location", "education",
+            "skills", "projects", "experience", "achievements", "summary",
+            "linkedin", "github", "resumeTemplate"
         ];
-
         const get = id => document.getElementById(id);
+        const draftStatus = get("draftStatus");
+
+        function setPreviewLink(container, label, value) {
+            const rawValue = value.trim();
+            if (!rawValue) return;
+            try {
+                const url = new URL(rawValue);
+                if (!["http:", "https:"].includes(url.protocol)) return;
+                const link = document.createElement("a");
+                link.href = url.href;
+                link.textContent = label;
+                link.target = "_blank";
+                link.rel = "noopener noreferrer";
+                container.appendChild(link);
+            } catch {
+                return;
+            }
+        }
 
         function updatePreview() {
             get("outName").textContent = get("name").value.trim() || "Your Name";
+            get("outHeadline").textContent = get("headline").value.trim();
+            get("outHeadline").hidden = !get("outHeadline").textContent;
 
             const contact = [
                 get("email").value.trim(),
                 get("phone").value.trim(),
                 get("location").value.trim()
             ].filter(Boolean);
-
             get("outContact").textContent = contact.join(" · ") || "Email · Phone · City";
 
-            const links = [
-                get("linkedin").value.trim(),
-                get("github").value.trim()
-            ].filter(Boolean);
-
-            get("outLinks").textContent = links.join(" | ");
+            const links = get("outLinks");
+            links.replaceChildren();
+            setPreviewLink(links, "LinkedIn", get("linkedin").value);
+            setPreviewLink(links, "GitHub", get("github").value);
+            links.hidden = !links.childElementCount;
 
             const sections = [
                 ["summary", "outSummary", "summarySection", "Your summary will appear here."],
                 ["education", "outEducation", "educationSection", "Your education will appear here."],
                 ["skills", "outSkills", "skillsSection", "Your skills will appear here."],
                 ["projects", "outProjects", "projectsSection", "Your projects will appear here."],
-                ["experience", "outExperience", "experienceSection", "Your experience will appear here."]
+                ["experience", "outExperience", "experienceSection", "Your experience will appear here."],
+                ["achievements", "outAchievements", "achievementsSection", "Your achievements will appear here."]
             ];
-
             sections.forEach(([field, output, section, placeholder]) => {
                 const value = get(field).value.trim();
                 get(output).textContent = value || placeholder;
                 get(section).hidden = !value;
             });
+
+            get("resume").className = `panel resume-template-${get("resumeTemplate").value}`;
         }
 
-        get("resumeForm").addEventListener("input", updatePreview);
-        get("resumeForm").addEventListener("submit", event => {
-            event.preventDefault();
-            updatePreview();
-        });
+        function draftData() {
+            return Object.fromEntries(fields.map(id => [id, get(id).value]));
+        }
 
-        get("saveBtn").addEventListener("click", () => {
-            const data = {};
-            fields.forEach(id => data[id] = get(id).value);
+        function saveDraft(showMessage = true) {
             try {
-                localStorage.setItem("campusLoopResumeDraft", JSON.stringify(data));
-                alert("Resume draft saved in this browser.");
-            } catch (error) {
-                alert("Could not save the draft in this browser.");
+                localStorage.setItem("campusLoopResumeDraft", JSON.stringify(draftData()));
+                if (showMessage) draftStatus.textContent = "Draft saved in this browser.";
+                return true;
+            } catch {
+                draftStatus.textContent = "Could not save draft. Check browser storage settings.";
+                return false;
             }
-        });
+        }
 
-        get("loadBtn").addEventListener("click", () => {
+        function loadDraft(showMessage = true) {
             try {
                 const saved = localStorage.getItem("campusLoopResumeDraft");
                 if (!saved) {
-                    alert("No saved resume draft found in this browser.");
-                    return;
+                    if (showMessage) draftStatus.textContent = "No saved draft found in this browser.";
+                    return false;
                 }
                 const data = JSON.parse(saved);
                 fields.forEach(id => {
                     if (typeof data[id] === "string") get(id).value = data[id];
                 });
                 updatePreview();
-                alert("Resume draft loaded.");
-            } catch (error) {
-                alert("Could not load the saved draft.");
+                if (showMessage) draftStatus.textContent = "Saved draft loaded.";
+                return true;
+            } catch {
+                draftStatus.textContent = "Could not load the saved draft.";
+                return false;
+            }
+        }
+
+        get("resumeForm").addEventListener("input", () => {
+            updatePreview();
+            if (saveDraft(false)) {
+                draftStatus.textContent = "Draft autosaved in this browser.";
             }
         });
-
+        get("resumeForm").addEventListener("change", updatePreview);
+        get("resumeForm").addEventListener("submit", event => {
+            event.preventDefault();
+            updatePreview();
+            draftStatus.textContent = "Preview updated.";
+        });
+        get("saveBtn").addEventListener("click", () => saveDraft());
+        get("loadBtn").addEventListener("click", () => loadDraft());
         get("pdfBtn").addEventListener("click", () => {
             updatePreview();
             window.print();
         });
 
+        loadDraft(false);
         updatePreview();
     </script>
 </body>

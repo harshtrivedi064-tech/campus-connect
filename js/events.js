@@ -47,6 +47,7 @@ async function apiRequest(path, method = 'GET', body) {
 
 const el = id => document.getElementById(id);
 let eventPhotoPreviewUrl = null;
+let allEvents = [];
 
 function addText(parent, tag, className, text) {
   const node = document.createElement(tag);
@@ -56,12 +57,18 @@ function addText(parent, tag, className, text) {
   return node;
 }
 
+function eventTimestamp(event) {
+  const timestamp = new Date(`${event.date}T${event.time || '00:00'}`).getTime();
+  return Number.isFinite(timestamp) ? timestamp : null;
+}
+
 function renderSummary(events) {
   const summary = el('eventSummary');
   summary.replaceChildren();
 
   const nextEvent = events.find(event => {
-    return new Date(`${event.date}T${event.time || '00:00'}`) >= new Date();
+    const timestamp = eventTimestamp(event);
+    return timestamp !== null && timestamp >= Date.now();
   });
 
   const total = document.createElement('div');
@@ -118,6 +125,9 @@ function renderRsvpButtons(event) {
 function renderEvent(event) {
   const card = document.createElement('article');
   card.className = 'event-card';
+  const timestamp = eventTimestamp(event);
+  const isPast = timestamp !== null && timestamp < Date.now();
+  if (isPast) card.classList.add('event-card-past');
 
   const cover = document.createElement('div');
   cover.className = 'event-cover';
@@ -143,10 +153,21 @@ function renderEvent(event) {
 
   const meta = document.createElement('div');
   meta.className = 'event-meta';
-  addText(meta, 'span', '', event.date);
-  addText(meta, 'span', '', event.time);
-  addText(meta, 'span', '', event.location);
+  const eventDate = timestamp === null ? null : new Date(timestamp);
+  const readableDate = !eventDate
+    ? event.date
+    : eventDate.toLocaleDateString(undefined, {
+      weekday: 'short',
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric'
+    });
+  const dateNode = addText(meta, eventDate ? 'time' : 'span', 'event-date',
+    `${readableDate}${event.time ? ` · ${event.time}` : ''}`);
+  if (eventDate) dateNode.dateTime = eventDate.toISOString();
+  addText(meta, 'span', 'event-location', `⌖ ${event.location}`);
 
+  if (isPast) addText(content, 'span', 'event-past-badge', 'Past event');
   addText(content, 'h3', 'event-title', event.title);
   addText(content, 'p', 'event-desc',
     event.description || 'No extra details provided.');
@@ -182,26 +203,70 @@ function renderEvent(event) {
   }
 
   card.append(cover, content);
-  content.append(counts, renderRsvpButtons(event), footer);
+  content.append(counts);
+  if (isPast) {
+    addText(content, 'p', 'event-registration-closed', 'Registration has closed.');
+  } else {
+    content.append(renderRsvpButtons(event));
+  }
+  content.append(footer);
   return card;
+}
+
+function renderFilteredEvents() {
+  const list = el('eventList');
+  const query = el('eventSearch').value.trim().toLocaleLowerCase();
+  const filter = el('eventTimeFilter').value;
+  const now = new Date();
+  const filtered = allEvents.filter(event => {
+    const timestamp = eventTimestamp(event);
+    const matchesTime = filter === 'all' ||
+      (filter === 'past'
+        ? timestamp !== null && timestamp < now.getTime()
+        : timestamp === null || timestamp >= now.getTime());
+    const searchable = [event.title, event.description, event.location, event.organizer]
+      .join(' ')
+      .toLocaleLowerCase();
+    return matchesTime && searchable.includes(query);
+  });
+  filtered.sort((a, b) => {
+    const aTime = eventTimestamp(a);
+    const bTime = eventTimestamp(b);
+    if (aTime === null) return bTime === null ? 0 : 1;
+    if (bTime === null) return -1;
+    return filter === 'past' ? bTime - aTime : aTime - bTime;
+  });
+  el('eventsHeading').textContent = filter === 'past'
+    ? 'Past events'
+    : filter === 'all'
+      ? 'All campus events'
+      : 'Upcoming events';
+  el('eventResultCount').textContent =
+    `${filtered.length} ${filtered.length === 1 ? 'event' : 'events'} shown`;
+  list.replaceChildren();
+
+  if (!filtered.length) {
+    addText(list, 'p', 'muted', allEvents.length
+      ? 'No events match these filters.'
+      : 'No events have been published yet.');
+    return;
+  }
+  filtered.forEach(event => list.appendChild(renderEvent(event)));
 }
 
 async function loadEvents() {
   const list = el('eventList');
   list.textContent = 'Loading events...';
+  el('eventResultCount').textContent = '';
 
   try {
-    const events = await apiRequest('/events');
-    renderSummary(events);
-    list.replaceChildren();
-
-    if (!events.length) {
-      addText(list, 'p', 'muted', 'No events have been published yet.');
-      return;
-    }
-
-    events.forEach(event => list.appendChild(renderEvent(event)));
+    allEvents = await apiRequest('/events');
+    renderSummary(allEvents);
+    renderFilteredEvents();
   } catch (error) {
+    allEvents = [];
+    renderSummary(allEvents);
+    el('eventResultCount').textContent = '';
     list.replaceChildren();
     addText(list, 'p', 'muted', error.message);
   }
@@ -281,6 +346,14 @@ function initializeEvents() {
   el('logoutLink').addEventListener('click', event => {
     event.preventDefault();
     logoutEventPage();
+  });
+  el('eventSearch').addEventListener('input', renderFilteredEvents);
+  el('eventTimeFilter').addEventListener('change', renderFilteredEvents);
+  el('clearEventFilters').addEventListener('click', () => {
+    el('eventSearch').value = '';
+    el('eventTimeFilter').value = 'upcoming';
+    renderFilteredEvents();
+    el('eventSearch').focus();
   });
 
   if (['admin', 'instructor'].includes(currentUser.role)) {

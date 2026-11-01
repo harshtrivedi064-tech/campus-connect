@@ -74,14 +74,112 @@ function renderPost(post) {
 
     addFeedText(article, 'p', 'feed-post-content', post.text);
 
+    const actions = document.createElement('div');
+    actions.className = 'feed-post-actions';
+
+    [
+        { vote: 'like', label: `Like · ${post.likeCount || 0}` },
+        { vote: 'dislike', label: `Dislike · ${post.dislikeCount || 0}` }
+    ].forEach(({ vote, label }) => {
+        const button = addFeedText(actions, 'button', 'feed-reaction', label);
+        button.type = 'button';
+        button.classList.toggle('active', post.userVote === vote);
+        button.setAttribute('aria-pressed', String(post.userVote === vote));
+        button.addEventListener('click', async () => {
+            button.disabled = true;
+            try {
+                await apiRequest(`/posts/${encodeURIComponent(post.id)}/vote`, 'POST', {
+                    vote: post.userVote === vote ? 'none' : vote
+                });
+                await loadPosts();
+            } catch (error) {
+                showFeedMessage(error.message, true);
+                button.disabled = false;
+            }
+        });
+    });
+
+    const commentToggle = addFeedText(
+        actions, 'button', 'feed-reaction',
+        `Comments · ${(post.comments || []).length}`
+    );
+    commentToggle.type = 'button';
+    commentToggle.setAttribute('aria-expanded', 'true');
+
     if (currentUser && post.userId === currentUser.id) {
-        const actions = document.createElement('div');
-        actions.className = 'feed-post-actions';
         const remove = addFeedText(actions, 'button', '', 'Delete');
         remove.type = 'button';
         remove.addEventListener('click', () => deletePost(post.id, remove));
-        article.appendChild(actions);
     }
+    article.appendChild(actions);
+
+    const comments = document.createElement('section');
+    comments.className = 'feed-comments';
+    comments.setAttribute('aria-label', 'Post comments');
+    const commentList = document.createElement('div');
+    commentList.className = 'feed-comment-list';
+
+    (post.comments || []).forEach(comment => {
+        const item = document.createElement('article');
+        item.className = 'feed-comment';
+        const detail = addFeedText(item, 'p', 'feed-comment-meta', comment.name || 'Campus member');
+        const time = new Date(comment.time);
+        if (!Number.isNaN(time.getTime())) {
+            detail.append(' · ', document.createTextNode(time.toLocaleString()));
+        }
+        addFeedText(item, 'p', 'feed-comment-text', comment.text);
+        if (currentUser &&
+            (comment.userId === currentUser.id || post.userId === currentUser.id)) {
+            const remove = addFeedText(item, 'button', 'feed-comment-delete', 'Delete comment');
+            remove.type = 'button';
+            remove.addEventListener('click', async () => {
+                remove.disabled = true;
+                try {
+                    await apiRequest(
+                        `/posts/${encodeURIComponent(post.id)}/comments/${encodeURIComponent(comment.id)}`,
+                        'DELETE'
+                    );
+                    await loadPosts();
+                } catch (error) {
+                    showFeedMessage(error.message, true);
+                    remove.disabled = false;
+                }
+            });
+        }
+        commentList.appendChild(item);
+    });
+    comments.appendChild(commentList);
+
+    const commentForm = document.createElement('form');
+    commentForm.className = 'feed-comment-form';
+    const commentInput = document.createElement('input');
+    commentInput.type = 'text';
+    commentInput.maxLength = 500;
+    commentInput.placeholder = 'Write a thoughtful comment...';
+    commentInput.setAttribute('aria-label', 'Write a comment');
+    commentInput.required = true;
+    const send = addFeedText(commentForm, 'button', 'feed-button', 'Comment');
+    send.type = 'submit';
+    commentForm.prepend(commentInput);
+    commentForm.addEventListener('submit', async event => {
+        event.preventDefault();
+        send.disabled = true;
+        try {
+            await apiRequest(`/posts/${encodeURIComponent(post.id)}/comments`, 'POST', {
+                text: commentInput.value
+            });
+            await loadPosts();
+        } catch (error) {
+            showFeedMessage(error.message, true);
+            send.disabled = false;
+        }
+    });
+    comments.appendChild(commentForm);
+    commentToggle.addEventListener('click', () => {
+        comments.hidden = !comments.hidden;
+        commentToggle.setAttribute('aria-expanded', String(!comments.hidden));
+    });
+    article.appendChild(comments);
 
     return article;
 }

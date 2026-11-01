@@ -1,6 +1,8 @@
 const express = require('express');
 const path = require('path');
 const cors = require('cors');
+const db = require('./db');
+const asyncHandler = require('./async-handler');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -105,6 +107,14 @@ app.use('/uploads/events', express.static(path.join(__dirname, 'uploads', 'event
     res.setHeader('Content-Security-Policy', "default-src 'none'; sandbox");
   }
 }));
+app.get('/uploads/events/:filename', asyncHandler(async (req, res, next) => {
+  const photo = await db.readPhoto(req.params.filename);
+  if (!photo) return next();
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('Content-Security-Policy', "default-src 'none'; sandbox");
+  res.setHeader('Cache-Control', 'public, max-age=86400, immutable');
+  res.type(photo.content_type).send(photo.data);
+}));
 
 app.get('/', (req, res) => {
   res.sendFile(path.join(rootDir, 'index.html'));
@@ -146,23 +156,40 @@ app.use((err, req, res, next) => {
 });
 
 // ---------- Start ----------
-const server = app.listen(PORT, () => {
-  console.log('Server running on http://localhost:' + PORT);
-  console.log('MCQ feature: ' + (mcqRouter ? 'enabled' : 'DISABLED (see message above)'));
-});
+let server;
+db.initialize().then(() => {
+  server = app.listen(PORT, () => {
+    console.log('Server running on http://localhost:' + PORT);
+    console.log('MCQ feature: ' + (mcqRouter ? 'enabled' : 'DISABLED (see message above)'));
+  });
 
-server.on('error', err => {
-  if (err.code === 'EADDRINUSE') {
-    console.error('\nPort ' + PORT + ' is already in use.');
-    console.error('Close the other terminal running the server, then try again.\n');
-  } else {
-    console.error('Server failed to start:', err);
-  }
-  process.exit(1);
+  server.on('error', err => {
+    if (err.code === 'EADDRINUSE') {
+      console.error('\nPort ' + PORT + ' is already in use.');
+      console.error('Close the other terminal running the server, then try again.\n');
+    } else {
+      console.error('Server failed to start:', err);
+    }
+    process.exit(1);
+  });
+}).catch(error => {
+  console.error('Persistent database initialization failed:', error);
+  db.close().finally(() => {
+    process.exitCode = 1;
+  });
 });
 
 // ---------- Clean shutdown with Ctrl + C ----------
 process.on('SIGINT', () => {
   console.log('\nShutting down...');
-  server.close(() => process.exit(0));
+  const closeServer = server
+    ? new Promise(resolve => server.close(resolve))
+    : Promise.resolve();
+  closeServer
+    .then(() => db.close())
+    .then(() => process.exit(0))
+    .catch(error => {
+      console.error('Failed to shut down cleanly:', error);
+      process.exitCode = 1;
+    });
 });

@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const { OAuth2Client } = require('google-auth-library');
 const db = require('../db');
+const asyncHandler = require('../async-handler');
 
 const router = express.Router();
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
@@ -121,31 +122,37 @@ router.get('/google/callback', async (req, res) => {
       return res.redirect('/login.html?google_error=email');
     }
 
-    const data = db.load();
     const email = profile.email.trim().toLowerCase();
-    let user = data.users.find(entry => entry.googleId === profile.sub) ||
-      data.users.find(entry => entry.email === email);
+    const outcome = await db.update(data => {
+      let user = data.users.find(entry => entry.googleId === profile.sub) ||
+        data.users.find(entry => entry.email === email);
 
-    if (user && user.googleId && user.googleId !== profile.sub) {
+      if (user && user.googleId && user.googleId !== profile.sub) {
+        return { error: 'account' };
+      }
+      if (!user) {
+        let id = Date.now();
+        while (data.users.some(entry => entry.id === id)) id++;
+        user = {
+          id,
+          name: profile.name || email.split('@')[0],
+          email,
+          password: null,
+          role: 'student',
+          googleId: profile.sub
+        };
+        data.users.push(user);
+      } else if (!user.googleId) {
+        user.googleId = profile.sub;
+      }
+
+      return { user };
+    });
+
+    if (outcome.error === 'account') {
       return res.redirect('/login.html?google_error=account');
     }
-    if (!user) {
-      let id = Date.now();
-      while (data.users.some(entry => entry.id === id)) id++;
-      user = {
-        id,
-        name: profile.name || email.split('@')[0],
-        email,
-        password: null,
-        role: 'student',
-        googleId: profile.sub
-      };
-      data.users.push(user);
-    } else if (!user.googleId) {
-      user.googleId = profile.sub;
-    }
-
-    db.save(data);
+    const user = outcome.user;
     const login = issueLoginToken(user);
     const fragment = new URLSearchParams({
       token: login.token,
@@ -158,7 +165,7 @@ router.get('/google/callback', async (req, res) => {
   }
 });
 
-router.post('/signup', async (req, res) => {
+router.post('/signup', asyncHandler(async (req, res) => {
   const { name, email, password, role } = req.body || {};
 
   if (!name || !email || !password) {
@@ -173,29 +180,29 @@ router.post('/signup', async (req, res) => {
     return res.status(400).json({ error: 'Choose whether you are a student or instructor.' });
   }
 
-  const data = db.load();
   const cleanEmail = String(email).trim().toLowerCase();
-
-  if (data.users.some((user) => user.email === cleanEmail)) {
+  const hash = await bcrypt.hash(String(password), 10);
+  const created = await db.update(data => {
+    if (data.users.some(user => user.email === cleanEmail)) return false;
+    data.users.push({
+      id: Date.now(),
+      name: String(name).trim(),
+      email: cleanEmail,
+      password: hash,
+      role
+    });
+    return true;
+  });
+  if (!created) {
     return res.status(400).json({ error: 'This email is already registered.' });
   }
 
-  const hash = await bcrypt.hash(String(password), 10);
-  data.users.push({
-    id: Date.now(),
-    name: String(name).trim(),
-    email: cleanEmail,
-    password: hash,
-    role
-  });
-  db.save(data);
-
   res.json({ message: 'Account created! Please log in.' });
-});
+}));
 
-router.post('/login', async (req, res) => {
+router.post('/login', asyncHandler(async (req, res) => {
   const { email, password } = req.body || {};
-  const data = db.load();
+  const data = await db.read();
   const user = data.users.find((entry) => entry.email === String(email || '').trim().toLowerCase());
 
   if (!user || !user.password ||
@@ -204,9 +211,9 @@ router.post('/login', async (req, res) => {
   }
 
   res.json(issueLoginToken(user));
-});
+}));
 
-function verifyToken(req, res, next) {
+async function verifyToken(req, res, next) {
   const header = req.headers.authorization || '';
   const token = header.startsWith('Bearer ') ? header.slice(7) : '';
 
@@ -214,9 +221,15 @@ function verifyToken(req, res, next) {
     return res.status(401).json({ error: 'Please log in again.' });
   }
 
+  let payload;
   try {
-    const payload = jwt.verify(token, SECRET);
-    const data = db.load();
+    payload = jwt.verify(token, SECRET);
+  } catch (error) {
+    return res.status(401).json({ error: 'Please log in again.' });
+  }
+
+  try {
+    const data = await db.read();
     const user = data.users.find((entry) => entry.id === payload.id);
 
     if (!user) {
@@ -226,7 +239,7 @@ function verifyToken(req, res, next) {
     req.user = { ...user, role: user.role || 'student' };
     next();
   } catch (error) {
-    res.status(401).json({ error: 'Please log in again.' });
+    next(error);
   }
 }
 

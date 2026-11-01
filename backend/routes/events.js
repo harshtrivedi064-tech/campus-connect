@@ -1,13 +1,12 @@
 const crypto = require('crypto');
 const express = require('express');
-const fs = require('fs/promises');
 const path = require('path');
 const multer = require('multer');
 const db = require('../db');
+const asyncHandler = require('../async-handler');
 const { verifyToken } = require('./auth');
 
 const router = express.Router();
-const eventPhotoDirectory = path.join(__dirname, '..', 'uploads', 'events');
 const photoTypes = {
   'image/jpeg': { extension: 'jpg', matches: buffer =>
     buffer.length >= 3 && buffer[0] === 0xff && buffer[1] === 0xd8 && buffer[2] === 0xff },
@@ -52,30 +51,28 @@ function parseEventPhoto(req, res, next) {
   });
 }
 
-router.get('/', (req, res) => {
-  const data = db.load();
-  const events = (data.events || []).slice().sort((a, b) => {
+router.get('/', asyncHandler(async (req, res) => {
+  const data = await db.read();
+  const events = data.events.slice().sort((a, b) => {
     const aDate = new Date(`${a.date}T${a.time || '00:00'}`);
     const bDate = new Date(`${b.date}T${b.time || '00:00'}`);
     return aDate - bDate;
-  }).map((event) => {
+  }).map(event => {
     const rsvps = Array.isArray(event.rsvps) ? event.rsvps : [];
-    const userRsvp = rsvps.find((entry) => entry.userId === req.user.id);
-
+    const userRsvp = rsvps.find(entry => entry.userId === req.user.id);
     return {
       ...event,
       rsvps,
-      attendingCount: rsvps.filter((entry) => entry.status === 'going').length,
-      interestedCount: rsvps.filter((entry) => entry.status === 'interested').length,
-      declinedCount: rsvps.filter((entry) => entry.status === 'not_going').length,
+      attendingCount: rsvps.filter(entry => entry.status === 'going').length,
+      interestedCount: rsvps.filter(entry => entry.status === 'interested').length,
+      declinedCount: rsvps.filter(entry => entry.status === 'not_going').length,
       userRsvp: userRsvp ? userRsvp.status : null
     };
   });
-
   res.json(events);
-});
+}));
 
-router.post('/', requireEventOrganizer, parseEventPhoto, async (req, res, next) => {
+router.post('/', requireEventOrganizer, parseEventPhoto, asyncHandler(async (req, res, next) => {
   const { title, date, time, location, description } = req.body || {};
   const cleanTitle = String(title || '').trim();
   const cleanLocation = String(location || '').trim();
@@ -100,16 +97,16 @@ router.post('/', requireEventOrganizer, parseEventPhoto, async (req, res, next) 
   }
 
   let photoUrl;
+  let photoFilename;
   if (req.file) {
     const photoType = photoTypes[req.file.mimetype];
     if (!photoType.matches(req.file.buffer)) {
       return res.status(400).json({ error: 'The uploaded file is not a valid image.' });
     }
-    const filename = `${crypto.randomUUID()}.${photoType.extension}`;
+    photoFilename = `${crypto.randomUUID()}.${photoType.extension}`;
     try {
-      await fs.mkdir(eventPhotoDirectory, { recursive: true });
-      await fs.writeFile(path.join(eventPhotoDirectory, filename), req.file.buffer, { flag: 'wx' });
-      photoUrl = `/uploads/events/${filename}`;
+      await db.savePhoto(photoFilename, req.file.mimetype, req.file.buffer);
+      photoUrl = `/uploads/events/${photoFilename}`;
     } catch (error) {
       return next(error);
     }
@@ -117,7 +114,6 @@ router.post('/', requireEventOrganizer, parseEventPhoto, async (req, res, next) 
 
   let event;
   try {
-    const data = db.load();
     event = {
       id: crypto.randomUUID(),
       title: cleanTitle,
@@ -131,12 +127,11 @@ router.post('/', requireEventOrganizer, parseEventPhoto, async (req, res, next) 
       createdAt: new Date().toISOString(),
       ...(photoUrl ? { photo: photoUrl } : {})
     };
-    data.events.unshift(event);
-    db.save(data);
+    await db.update(data => data.events.unshift(event));
   } catch (error) {
-    if (photoUrl) {
+    if (photoFilename) {
       try {
-        await fs.unlink(path.join(eventPhotoDirectory, path.basename(photoUrl)));
+        await db.deletePhoto(photoFilename);
       } catch (cleanupError) {
         if (cleanupError.code !== 'ENOENT') console.error('Unable to remove unsaved event photo:', cleanupError);
       }
@@ -145,71 +140,73 @@ router.post('/', requireEventOrganizer, parseEventPhoto, async (req, res, next) 
   }
 
   res.status(201).json(event);
-});
+}));
 
-router.post('/:id/rsvp', (req, res) => {
+router.post('/:id/rsvp', asyncHandler(async (req, res) => {
   const status = String(req.body?.status || '').trim();
   if (!['going', 'interested', 'not_going'].includes(status)) {
     return res.status(400).json({ error: 'Choose a valid RSVP status.' });
   }
 
-  const data = db.load();
-  const event = (data.events || []).find((entry) => entry.id === req.params.id);
+  const outcome = await db.update(data => {
+    const event = data.events.find(entry => entry.id === req.params.id);
+    if (!event) return null;
 
-  if (!event) {
-    return res.status(404).json({ error: 'Event not found.' });
-  }
-
-  const rsvps = Array.isArray(event.rsvps) ? event.rsvps : [];
-  const existing = rsvps.find((entry) => entry.userId === req.user.id);
-
-  if (existing) {
-    existing.status = status;
-    existing.name = req.user.name;
-    existing.updatedAt = new Date().toISOString();
-  } else {
-    rsvps.push({
-      userId: req.user.id,
-      name: req.user.name,
+    const rsvps = Array.isArray(event.rsvps) ? event.rsvps : [];
+    const existing = rsvps.find(entry => entry.userId === req.user.id);
+    if (existing) {
+      existing.status = status;
+      existing.name = req.user.name;
+      existing.updatedAt = new Date().toISOString();
+    } else {
+      rsvps.push({
+        userId: req.user.id,
+        name: req.user.name,
+        status,
+        updatedAt: new Date().toISOString()
+      });
+    }
+    event.rsvps = rsvps;
+    return {
+      eventId: event.id,
       status,
-      updatedAt: new Date().toISOString()
-    });
-  }
-
-  event.rsvps = rsvps;
-  db.save(data);
-
-  res.json({
-    eventId: event.id,
-    status,
-    attendingCount: rsvps.filter((entry) => entry.status === 'going').length,
-    interestedCount: rsvps.filter((entry) => entry.status === 'interested').length,
-    declinedCount: rsvps.filter((entry) => entry.status === 'not_going').length
+      attendingCount: rsvps.filter(entry => entry.status === 'going').length,
+      interestedCount: rsvps.filter(entry => entry.status === 'interested').length,
+      declinedCount: rsvps.filter(entry => entry.status === 'not_going').length
+    };
   });
-});
 
-router.delete('/:id', (req, res) => {
-  const data = db.load();
-  const event = (data.events || []).find((entry) => entry.id === req.params.id);
+  if (!outcome) return res.status(404).json({ error: 'Event not found.' });
+  res.json(outcome);
+}));
 
-  if (!event) {
+router.delete('/:id', asyncHandler(async (req, res) => {
+  const outcome = await db.update(data => {
+    const event = data.events.find(entry => entry.id === req.params.id);
+    if (!event) return { error: 'missing' };
+    if (event.organizerId !== req.user.id && req.user.role !== 'admin') {
+      return { error: 'forbidden' };
+    }
+    data.events = data.events.filter(entry => entry.id !== req.params.id);
+    return { event };
+  });
+
+  if (outcome.error === 'missing') {
     return res.status(404).json({ error: 'Event not found.' });
   }
-
-  if (event.organizerId !== req.user.id && req.user.role !== 'admin') {
+  if (outcome.error === 'forbidden') {
     return res.status(403).json({ error: 'Only the event organizer can remove it.' });
   }
 
-  data.events = (data.events || []).filter((entry) => entry.id !== req.params.id);
-  db.save(data);
+  const { event } = outcome;
   if (event.photo && /^\/uploads\/events\/[0-9a-f-]+\.(jpg|png|webp|gif)$/i.test(event.photo)) {
-    fs.unlink(path.join(eventPhotoDirectory, path.basename(event.photo)))
-      .catch(error => {
-        if (error.code !== 'ENOENT') console.error('Unable to remove deleted event photo:', error);
-      });
+    try {
+      await db.deletePhoto(path.basename(event.photo));
+    } catch (error) {
+      console.error('Unable to remove deleted event photo:', error);
+    }
   }
-
   res.json({ message: 'Event removed.' });
-});
+}));
 
 module.exports = router;

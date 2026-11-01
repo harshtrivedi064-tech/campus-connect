@@ -87,6 +87,16 @@
                 </div>
                 <div id="rosterList"></div>
             </section>
+
+            <section id="attendanceReportReview" class="attendance-card" hidden>
+                <div class="attendance-section-heading">
+                    <div>
+                        <span class="attendance-eyebrow">STUDENT REQUESTS</span>
+                        <h2>Attendance correction reports</h2>
+                    </div>
+                </div>
+                <div id="attendanceReports"></div>
+            </section>
         </section>
 
         <section id="studentView" hidden>
@@ -111,6 +121,27 @@
                     </div>
                 </div>
                 <div id="myAttendance"></div>
+            </div>
+
+            <div class="attendance-card">
+                <div class="attendance-section-heading">
+                    <div>
+                        <span class="attendance-eyebrow">NEED A CORRECTION?</span>
+                        <h2>Report an incorrect absence</h2>
+                    </div>
+                </div>
+                <p class="attendance-report-note">
+                    Choose an absent class and explain the issue. Your instructor will review it.
+                </p>
+                <form id="attendanceCorrectionForm" class="attendance-correction-form">
+                    <label for="correctionSession">Absent class</label>
+                    <select id="correctionSession" required></select>
+                    <label for="correctionReason">Why should this be corrected?</label>
+                    <textarea id="correctionReason" rows="3" maxlength="500" required
+                        placeholder="Share a brief explanation (max 500 characters)."></textarea>
+                    <button type="submit" class="attendance-primary-button">Send report</button>
+                </form>
+                <div id="myAttendanceReports" aria-live="polite"></div>
             </div>
         </section>
 

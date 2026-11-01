@@ -7,6 +7,7 @@ const attendanceToken = localStorage.getItem('token');
 let attendanceUser = null;
 let attendanceReportRecords = [];
 let filteredAttendanceReport = [];
+let myAttendanceRecords = [];
 
 try {
     attendanceUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
@@ -70,6 +71,159 @@ function reportStat(summary, label, value, icon) {
     addAttendanceText(card, 'p', '', label);
     addAttendanceText(card, 'strong', '', value);
     summary.appendChild(card);
+}
+
+function reportStatusLabel(status) {
+    if (status === 'corrected') return 'Approved · marked present';
+    if (status === 'rejected') return 'Reviewed · remains absent';
+    return 'Awaiting instructor review';
+}
+
+function renderMyCorrectionReports(reports) {
+    const list = document.getElementById('myAttendanceReports');
+    list.replaceChildren();
+    if (!reports.length) {
+        addAttendanceText(list, 'p', 'attendance-empty', 'Your submitted reports will appear here.');
+        return;
+    }
+
+    reports.forEach(report => {
+        const card = document.createElement('article');
+        card.className = 'attendance-correction-report';
+        addAttendanceText(card, 'strong', '', `${report.className} · ${report.date}`);
+        addAttendanceText(card, 'p', '', report.reason);
+        const status = addAttendanceText(card, 'span',
+            `attendance-report-state ${report.status}`, reportStatusLabel(report.status));
+        status.setAttribute('aria-label', `Report status: ${reportStatusLabel(report.status)}`);
+        list.appendChild(card);
+    });
+}
+
+async function loadMyCorrectionReports() {
+    const form = document.getElementById('attendanceCorrectionForm');
+    const select = document.getElementById('correctionSession');
+    const submit = form.querySelector('button[type="submit"]');
+    submit.disabled = true;
+    try {
+        const reports = await attendanceRequest('/attendance/reports/mine');
+        const pending = new Set(reports
+            .filter(report => report.status === 'pending')
+            .map(report => report.sessionId));
+        const absentRecords = myAttendanceRecords.filter(record =>
+            record.status === 'absent' && !pending.has(record.sessionId)
+        );
+
+        select.replaceChildren();
+        const placeholder = document.createElement('option');
+        placeholder.value = '';
+        placeholder.textContent = absentRecords.length
+            ? 'Choose an absent class'
+            : 'No unreported absences';
+        placeholder.disabled = true;
+        placeholder.selected = true;
+        select.appendChild(placeholder);
+        absentRecords.forEach(record => {
+            const option = document.createElement('option');
+            option.value = record.sessionId;
+            option.textContent = `${record.className} · ${record.date} · ${record.instructor}`;
+            select.appendChild(option);
+        });
+        submit.disabled = !absentRecords.length;
+        renderMyCorrectionReports(reports);
+    } catch (error) {
+        const list = document.getElementById('myAttendanceReports');
+        list.replaceChildren();
+        addAttendanceText(list, 'p', 'attendance-empty', error.message);
+    }
+}
+
+async function submitAttendanceCorrection(event) {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const button = form.querySelector('button[type="submit"]');
+    button.disabled = true;
+    try {
+        await attendanceRequest('/attendance/reports', 'POST', {
+            sessionId: document.getElementById('correctionSession').value,
+            reason: document.getElementById('correctionReason').value.trim()
+        });
+        form.reset();
+        showAttendanceMessage('Correction report sent to your instructor.');
+        await loadMyAttendance();
+    } catch (error) {
+        showAttendanceMessage(error.message, true);
+    } finally {
+        button.disabled = false;
+        await loadMyCorrectionReports();
+    }
+}
+
+async function loadAttendanceCorrectionReports() {
+    const section = document.getElementById('attendanceReportReview');
+    const list = document.getElementById('attendanceReports');
+    section.hidden = false;
+    list.textContent = 'Loading correction reports...';
+    try {
+        const reports = await attendanceRequest('/attendance/reports');
+        list.replaceChildren();
+        if (!reports.length) {
+            addAttendanceText(list, 'p', 'attendance-empty', 'No correction reports yet.');
+            return;
+        }
+
+        reports.forEach(report => {
+            const card = document.createElement('article');
+            card.className = 'attendance-correction-report';
+            const title = `${report.studentName} · ${report.className} · ${report.date}`;
+            addAttendanceText(card, 'strong', '', title);
+            if (report.studentEmail) {
+                addAttendanceText(card, 'small', 'attendance-report-email', report.studentEmail);
+            }
+            addAttendanceText(card, 'p', '', report.reason);
+            addAttendanceText(card, 'span',
+                `attendance-report-state ${report.status}`, reportStatusLabel(report.status));
+
+            if (report.status === 'pending') {
+                const actions = document.createElement('div');
+                actions.className = 'attendance-report-actions';
+                [
+                    { decision: 'corrected', label: 'Approve · mark present' },
+                    { decision: 'rejected', label: 'Keep absent' }
+                ].forEach(({ decision, label }) => {
+                    const button = addAttendanceText(actions, 'button',
+                        'attendance-secondary-button', label);
+                    button.type = 'button';
+                    button.addEventListener('click', async () => {
+                        actions.querySelectorAll('button').forEach(item => {
+                            item.disabled = true;
+                        });
+                        try {
+                            await attendanceRequest(
+                                `/attendance/reports/${encodeURIComponent(report.id)}`,
+                                'PATCH',
+                                { decision }
+                            );
+                            await loadAttendanceCorrectionReports();
+                            await loadSessions();
+                            await loadAttendanceReport();
+                            showAttendanceMessage('Attendance report reviewed.');
+                        } catch (error) {
+                            showAttendanceMessage(error.message, true);
+                            actions.querySelectorAll('button').forEach(item => {
+                                item.disabled = false;
+                            });
+                        }
+                    });
+                });
+                card.appendChild(actions);
+            }
+            list.appendChild(card);
+        });
+    } catch (error) {
+        list.replaceChildren();
+        addAttendanceText(list, 'p', 'attendance-empty', error.message);
+        showAttendanceMessage(error.message, true);
+    }
 }
 
 function renderAttendanceReport() {
@@ -494,6 +648,7 @@ async function loadMyAttendance() {
     try {
         const records = await attendanceRequest('/attendance/mine');
         if (!records) return;
+        myAttendanceRecords = records;
 
         const list = document.getElementById('myAttendance');
         const summary = document.getElementById('attendanceSummary');
@@ -601,6 +756,7 @@ async function loadMyAttendance() {
         if (!records.length) {
             list.textContent = 'No attendance records yet.';
             list.className = 'attendance-empty';
+            await loadMyCorrectionReports();
             return;
         }
 
@@ -668,6 +824,7 @@ async function loadMyAttendance() {
         });
 
         list.className = 'attendance-subject-list';
+        await loadMyCorrectionReports();
 
     } catch (error) {
         showAttendanceMessage(error.message, true);
@@ -686,6 +843,7 @@ function initializeAttendance() {
         document.getElementById('sessionForm').addEventListener(
             'submit', createAttendanceSession
         );
+        loadAttendanceCorrectionReports();
         const today = new Date();
         today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
         document.getElementById('classDate').value = today.toISOString().slice(0, 10);
@@ -696,6 +854,9 @@ function initializeAttendance() {
 
     document.getElementById('studentView').hidden = false;
     initializeAttendanceReports();
+    document.getElementById('attendanceCorrectionForm').addEventListener(
+        'submit', submitAttendanceCorrection
+    );
     loadMyAttendance();
 }
 

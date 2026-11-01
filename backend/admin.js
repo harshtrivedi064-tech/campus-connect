@@ -15,27 +15,23 @@ async function createAdmin() {
         return;
     }
 
-    const data = db.load();
-    data.users = Array.isArray(data.users) ? data.users : [];
-
-    const existing = data.users.find(user => user.email === email);
     const passwordHash = await bcrypt.hash(password, 10);
-
-    if (existing) {
-        existing.name = name;
-        existing.password = passwordHash;
-        existing.role = 'admin';
-    } else {
-        data.users.push({
-            id: Date.now(),
-            name,
-            email,
-            password: passwordHash,
-            role: 'admin'
-        });
-    }
-
-    db.save(data);
+    await db.update(data => {
+        const existing = data.users.find(user => user.email === email);
+        if (existing) {
+            existing.name = name;
+            existing.password = passwordHash;
+            existing.role = 'admin';
+        } else {
+            data.users.push({
+                id: Date.now(),
+                name,
+                email,
+                password: passwordHash,
+                role: 'admin'
+            });
+        }
+    });
     console.log(`Admin account ready for ${email}`);
 }
 
