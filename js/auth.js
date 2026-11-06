@@ -73,6 +73,9 @@ function handleGoogleLoginReturn() {
     }
 }
 
+const authProfileLink = document.getElementById('authProfileLink');
+if (authProfileLink) authProfileLink.hidden = !localStorage.getItem('token');
+
 async function signup() {
     const name = document.getElementById('signupName').value.trim();
     const email = document.getElementById('signupEmail').value.trim();

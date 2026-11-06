@@ -62,14 +62,44 @@ router.get('/', asyncHandler(async (req, res) => {
     const userRsvp = rsvps.find(entry => entry.userId === req.user.id);
     return {
       ...event,
-      rsvps,
+      rsvps: rsvps.map(({ userId, name, status, updatedAt }) => ({
+        userId, name, status, updatedAt
+      })),
+      userRegistration: userRsvp?.registration
+        ? {
+            name: userRsvp.registration.name,
+            email: userRsvp.registration.email,
+            program: userRsvp.registration.program
+          }
+        : null,
       attendingCount: rsvps.filter(entry => entry.status === 'going').length,
+      registeredCount: rsvps.filter(entry =>
+        entry.status === 'going' && entry.registration).length,
       interestedCount: rsvps.filter(entry => entry.status === 'interested').length,
       declinedCount: rsvps.filter(entry => entry.status === 'not_going').length,
       userRsvp: userRsvp ? userRsvp.status : null
     };
   });
   res.json(events);
+}));
+
+router.get('/:id/registrations', asyncHandler(async (req, res) => {
+  const data = await db.read();
+  const event = data.events.find(entry => entry.id === req.params.id);
+  if (!event) return res.status(404).json({ error: 'Event not found.' });
+  if (event.organizerId !== req.user.id && req.user.role !== 'admin') {
+    return res.status(403).json({ error: 'Only the event organizer can view registrations.' });
+  }
+
+  const registrations = (Array.isArray(event.rsvps) ? event.rsvps : [])
+    .filter(entry => entry.status === 'going' && entry.registration)
+    .map(entry => ({
+      name: entry.registration.name,
+      email: entry.registration.email,
+      program: entry.registration.program,
+      registeredAt: entry.updatedAt
+    }));
+  res.json({ registrations });
 }));
 
 router.post('/', requireEventOrganizer, parseEventPhoto, asyncHandler(async (req, res, next) => {
@@ -148,6 +178,21 @@ router.post('/:id/rsvp', asyncHandler(async (req, res) => {
     return res.status(400).json({ error: 'Choose a valid RSVP status.' });
   }
 
+  let registration;
+  if (status === 'going') {
+    const details = req.body?.registration;
+    const name = String(details?.name || '').trim();
+    const email = String(details?.email || '').trim().toLowerCase();
+    const program = String(details?.program || '').trim();
+    if (!name || name.length > 80 || !email || email.length > 120 ||
+        !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || program.length > 80) {
+      return res.status(400).json({
+        error: 'Enter a valid name and email. Course or year must be 80 characters or fewer.'
+      });
+    }
+    registration = { name, email, program };
+  }
+
   const outcome = await db.update(data => {
     const event = data.events.find(entry => entry.id === req.params.id);
     if (!event) return null;
@@ -158,11 +203,14 @@ router.post('/:id/rsvp', asyncHandler(async (req, res) => {
       existing.status = status;
       existing.name = req.user.name;
       existing.updatedAt = new Date().toISOString();
+      if (registration) existing.registration = registration;
+      else delete existing.registration;
     } else {
       rsvps.push({
         userId: req.user.id,
         name: req.user.name,
         status,
+        ...(registration ? { registration } : {}),
         updatedAt: new Date().toISOString()
       });
     }

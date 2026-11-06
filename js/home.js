@@ -13,9 +13,9 @@ function initializeHomeDashboard() {
         greeting.hidden = false;
 
         const accountLink = document.getElementById('homeAccountLink');
-        accountLink.href = 'feed.html';
+        accountLink.href = 'profile.html';
         accountLink.replaceChildren(
-            document.createTextNode('Open Feed '),
+            document.createTextNode('My Profile '),
             Object.assign(document.createElement('span'), { textContent: '↗' })
         );
 

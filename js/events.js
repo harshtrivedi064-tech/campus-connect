@@ -89,9 +89,15 @@ function renderSummary(events) {
 function renderRsvpButtons(event) {
   const wrap = document.createElement('div');
   wrap.className = 'rsvp-actions';
+  const registrationForm = createRegistrationForm(event);
 
   [
-    { key: 'going', label: 'Register / Going' },
+    {
+      key: 'going',
+      label: event.userRsvp === 'going'
+        ? event.userRegistration ? 'Registered · Edit details' : 'Complete registration'
+        : 'Register / Going'
+    },
     { key: 'interested', label: 'Interested' },
     { key: 'not_going', label: 'Can’t attend' }
   ].forEach(({ key, label }) => {
@@ -104,6 +110,14 @@ function renderRsvpButtons(event) {
     if (event.userRsvp === key) button.classList.add('active');
 
     button.addEventListener('click', async () => {
+      if (key === 'going') {
+        registrationForm.hidden = !registrationForm.hidden;
+        if (!registrationForm.hidden) {
+          registrationForm.elements.attendeeName.focus();
+        }
+        return;
+      }
+
       button.disabled = true;
       try {
         await apiRequest(`/events/${encodeURIComponent(event.id)}/rsvp`,
@@ -119,7 +133,173 @@ function renderRsvpButtons(event) {
     wrap.appendChild(button);
   });
 
-  return wrap;
+  const actions = document.createElement('div');
+  actions.append(wrap, registrationForm);
+  return actions;
+}
+
+function createRegistrationForm(event) {
+  const form = document.createElement('form');
+  form.className = 'event-registration-form';
+  form.hidden = true;
+  form.setAttribute('aria-label', `Register for ${event.title}`);
+  form.dataset.eventId = event.id;
+
+  addText(form, 'h4', '', 'Quick event registration');
+  addText(form, 'p', 'registration-intro',
+    'Confirm your details to register. Your name and email are pre-filled and shared with the event organizer.');
+
+  const savedDetails = event.userRegistration || {};
+  [
+    {
+      name: 'attendeeName',
+      label: 'Full name *',
+      type: 'text',
+      value: savedDetails.name || currentUser.name || '',
+      placeholder: 'Your full name',
+      maxLength: 80,
+      required: true,
+      autocomplete: 'name'
+    },
+    {
+      name: 'attendeeEmail',
+      label: 'Email address *',
+      type: 'email',
+      value: savedDetails.email || currentUser.email || '',
+      placeholder: 'you@example.com',
+      maxLength: 120,
+      required: true,
+      autocomplete: 'email'
+    },
+    {
+      name: 'attendeeProgram',
+      label: 'Course / year (optional)',
+      type: 'text',
+      value: savedDetails.program || '',
+      placeholder: 'e.g. Computer Science · Year 2',
+      maxLength: 80,
+      required: false,
+      autocomplete: 'off'
+    }
+  ].forEach(field => {
+    const label = document.createElement('label');
+    label.textContent = field.label;
+    const input = document.createElement('input');
+    input.name = field.name;
+    input.type = field.type;
+    input.value = field.value;
+    input.placeholder = field.placeholder;
+    input.maxLength = field.maxLength;
+    input.required = field.required;
+    input.autocomplete = field.autocomplete;
+    label.appendChild(input);
+    form.appendChild(label);
+  });
+
+  const actions = document.createElement('div');
+  actions.className = 'registration-form-actions';
+  const submit = document.createElement('button');
+  submit.type = 'submit';
+  submit.className = 'registration-submit';
+  submit.textContent = 'Confirm registration';
+  const cancel = document.createElement('button');
+  cancel.type = 'button';
+  cancel.className = 'registration-cancel';
+  cancel.textContent = 'Cancel';
+  cancel.addEventListener('click', () => {
+    form.hidden = true;
+  });
+  actions.append(submit, cancel);
+  const message = document.createElement('p');
+  message.className = 'registration-message';
+  form.append(actions, message);
+  form.addEventListener('submit', submitEventRegistration);
+  return form;
+}
+
+async function submitEventRegistration(submitEvent) {
+  submitEvent.preventDefault();
+  const form = submitEvent.currentTarget;
+  const event = allEvents.find(entry => entry.id === form.dataset.eventId);
+  const submit = form.querySelector('.registration-submit');
+  const message = form.querySelector('.registration-message');
+  if (!event) {
+    message.textContent = 'This event is no longer available. Refresh and try again.';
+    return;
+  }
+
+  submit.disabled = true;
+  message.textContent = 'Saving your registration...';
+  try {
+    await apiRequest(`/events/${encodeURIComponent(event.id)}/rsvp`, 'POST', {
+      status: 'going',
+      registration: {
+        name: form.elements.attendeeName.value.trim(),
+        email: form.elements.attendeeEmail.value.trim(),
+        program: form.elements.attendeeProgram.value.trim()
+      }
+    });
+    await loadEvents();
+  } catch (error) {
+    message.textContent = error.message;
+  } finally {
+    submit.disabled = false;
+  }
+}
+
+function createOrganizerRegistrationPanel(event) {
+  const wrapper = document.createElement('div');
+  wrapper.className = 'organizer-registration';
+  const panel = document.createElement('div');
+  panel.className = 'organizer-registration-panel';
+  panel.hidden = true;
+  panel.setAttribute('aria-live', 'polite');
+  panel.dataset.eventId = event.id;
+
+  const button = document.createElement('button');
+  button.type = 'button';
+  button.className = 'organizer-registration-toggle';
+  button.textContent = `Registrations (${event.registeredCount || 0})`;
+  button.setAttribute('aria-expanded', 'false');
+  button.addEventListener('click', async () => {
+    panel.hidden = !panel.hidden;
+    button.setAttribute('aria-expanded', String(!panel.hidden));
+    if (panel.hidden || panel.dataset.loaded === 'true') return;
+
+    button.disabled = true;
+    panel.replaceChildren();
+    addText(panel, 'p', 'registration-loading', 'Loading registrations...');
+    try {
+      const { registrations } = await apiRequest(
+        `/events/${encodeURIComponent(event.id)}/registrations`
+      );
+      panel.replaceChildren();
+      if (!registrations.length) {
+        addText(panel, 'p', 'registration-empty', 'No completed registrations yet.');
+      } else {
+        const list = document.createElement('ul');
+        registrations.forEach(registration => {
+          const item = document.createElement('li');
+          addText(item, 'strong', '', registration.name);
+          addText(item, 'a', 'registration-email', registration.email);
+          item.querySelector('a').href = `mailto:${encodeURIComponent(registration.email)}`;
+          if (registration.program) {
+            addText(item, 'span', 'registration-program', registration.program);
+          }
+          list.appendChild(item);
+        });
+        panel.appendChild(list);
+      }
+      panel.dataset.loaded = 'true';
+    } catch (error) {
+      panel.replaceChildren();
+      addText(panel, 'p', 'registration-error', error.message);
+    } finally {
+      button.disabled = false;
+    }
+  });
+  wrapper.append(button, panel);
+  return wrapper;
 }
 
 function renderEvent(event) {
@@ -183,6 +363,8 @@ function renderEvent(event) {
   addText(footer, 'span', '', `Hosted by ${event.organizer || 'Campus Loop'}`);
 
   if (currentUser.role === 'admin' || event.organizerId === currentUser.id) {
+    footer.appendChild(createOrganizerRegistrationPanel(event));
+
     const remove = document.createElement('button');
     remove.type = 'button';
     remove.className = 'delete-btn';

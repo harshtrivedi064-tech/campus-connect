@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#080f25">
+  <title>My Profile | Campus Loop</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body class="profile-page">
+  <nav class="navbar">
+    <a class="profile-brand" href="index.html">Campus <span>Loop</span></a>
+    <div class="nav-links" aria-label="Main navigation">
+      <a href="index.html">Home</a>
+      <a href="feed.html">Feed</a>
+      <a href="attendance.html">Attendance</a>
+      <a href="events.html">Events</a>
+      <a href="internships.html">Internships</a>
+      <a href="mcq.html">MCQ Maker</a>
+      <a href="ai-chat.html">AI Chat</a>
+      <a href="resume.html">Resume Builder</a>
+      <a href="profile.html" aria-current="page">My Profile</a>
+      <a href="#" id="profileLogout">Logout</a>
+    </div>
+  </nav>
+
+  <main class="profile-main">
+    <header class="profile-hero">
+      <p class="profile-eyebrow">YOUR CAMPUS LOOP</p>
+      <h1>My <span>Profile</span></h1>
+      <p>Your account details and personal activity, together in one place.</p>
+    </header>
+
+    <p id="profileStatus" class="profile-status" role="status" aria-live="polite">Loading your profile...</p>
+
+    <section id="profileOverview" class="profile-overview" hidden aria-labelledby="profileName">
+      <div class="profile-avatar" id="profileAvatar" aria-hidden="true"></div>
+      <div class="profile-identity">
+        <p class="profile-eyebrow">ACCOUNT</p>
+        <h2 id="profileName"></h2>
+        <p id="profileEmail" class="profile-email"></p>
+      </div>
+      <div class="profile-account-meta">
+        <span id="profileRole" class="profile-role"></span>
+        <span id="profileMemberSince"></span>
+      </div>
+    </section>
+
+    <section id="profileStats" class="profile-stats" hidden aria-label="Your activity summary"></section>
+
+    <div id="profileActivity" class="profile-activity" hidden>
+      <section class="profile-section" aria-labelledby="postsHeading">
+        <div class="profile-section-heading">
+          <div>
+            <p class="profile-eyebrow">COMMUNITY</p>
+            <h2 id="postsHeading">Community activity</h2>
+          </div>
+          <a href="feed.html">Open Feed</a>
+        </div>
+        <div id="profilePosts" class="profile-list"></div>
+      </section>
+
+      <section class="profile-section" aria-labelledby="eventsHeading">
+        <div class="profile-section-heading">
+          <div>
+            <p class="profile-eyebrow">CAMPUS LIFE</p>
+            <h2 id="eventsHeading">My events</h2>
+          </div>
+          <a href="events.html">Explore Events</a>
+        </div>
+        <div id="profileEvents" class="profile-list"></div>
+      </section>
+
+      <section class="profile-section" aria-labelledby="internshipsHeading">
+        <div class="profile-section-heading">
+          <div>
+            <p class="profile-eyebrow">CAREER</p>
+            <h2 id="internshipsHeading">Internships</h2>
+          </div>
+          <a href="internships.html">Open Internships</a>
+        </div>
+        <div id="profileInternships" class="profile-list"></div>
+      </section>
+
+      <section class="profile-section" aria-labelledby="attendanceHeading">
+        <div class="profile-section-heading">
+          <div>
+            <p class="profile-eyebrow">LEARNING</p>
+            <h2 id="attendanceHeading">Attendance</h2>
+          </div>
+          <a href="attendance.html">Open Attendance</a>
+        </div>
+        <div id="profileAttendance" class="profile-list"></div>
+      </section>
+    </div>
+
+    <section class="profile-privacy" hidden id="profilePrivacy">
+      <span aria-hidden="true">🔒</span>
+      <p>This page shows your own account and activity. Private profile details are only loaded for the signed-in account.</p>
+    </section>
+  </main>
+
+  <footer class="profile-footer">Campus Loop · Connect. Discover. Participate.</footer>
+  <script src="js/profile.js"></script>
+</body>
+
+</html>

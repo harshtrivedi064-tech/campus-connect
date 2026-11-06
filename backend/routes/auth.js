@@ -139,7 +139,8 @@ router.get('/google/callback', async (req, res) => {
           email,
           password: null,
           role: 'student',
-          googleId: profile.sub
+          googleId: profile.sub,
+          createdAt: new Date().toISOString()
         };
         data.users.push(user);
       } else if (!user.googleId) {
@@ -189,7 +190,8 @@ router.post('/signup', asyncHandler(async (req, res) => {
       name: String(name).trim(),
       email: cleanEmail,
       password: hash,
-      role
+      role,
+      createdAt: new Date().toISOString()
     });
     return true;
   });
