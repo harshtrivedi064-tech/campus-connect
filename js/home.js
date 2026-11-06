@@ -18,6 +18,13 @@ function initializeHomeDashboard() {
             document.createTextNode('Open Feed '),
             Object.assign(document.createElement('span'), { textContent: '↗' })
         );
+
+        const getStartedLink = document.getElementById('homeGetStarted');
+        getStartedLink.href = 'feed.html';
+        getStartedLink.replaceChildren(
+            document.createTextNode('Open your feed '),
+            Object.assign(document.createElement('span'), { textContent: '→' })
+        );
     }
 
     const dialog = document.getElementById('homeToolsDialog');

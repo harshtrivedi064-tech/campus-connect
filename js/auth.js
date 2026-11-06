@@ -61,7 +61,7 @@ function handleGoogleLoginReturn() {
         const bytes = Uint8Array.from(atob(padded), character => character.charCodeAt(0));
         const user = JSON.parse(new TextDecoder().decode(bytes));
         if (!user || !Number.isSafeInteger(user.id) || !user.email ||
-            !['student', 'instructor'].includes(user.role)) {
+            !['student', 'instructor', 'admin'].includes(user.role)) {
             throw new Error('Invalid Google sign-in details.');
         }
 
