@@ -10,8 +10,12 @@ router.get('/', verifyToken, asyncHandler(async (req, res) => {
   const data = await db.read();
   res.json(data.posts.map(post => {
     const { likes, dislikes, ...visiblePost } = post;
+    const author = data.users.find(user => String(user.id) === String(post.userId));
     return {
       ...visiblePost,
+      ...(typeof author?.profilePicture === 'string'
+        ? { profilePicture: author.profilePicture }
+        : {}),
       likeCount: likes.length,
       dislikeCount: dislikes.length,
       userVote: likes.includes(req.user.id)
@@ -36,6 +40,9 @@ router.post('/', verifyToken, asyncHandler(async (req, res) => {
     id: Date.now(),
     userId: req.user.id,
     name: req.user.name,
+    ...(typeof req.user.profilePicture === 'string'
+      ? { profilePicture: req.user.profilePicture }
+      : {}),
     text,
     time: new Date().toISOString(),
     likes: [],

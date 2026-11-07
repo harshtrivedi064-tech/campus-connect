@@ -4,6 +4,7 @@ const { Pool } = require('pg');
 
 const FILE = process.env.CAMPUS_CONNECT_DATA_FILE || path.join(__dirname, 'data.json');
 const PHOTO_DIRECTORY = path.join(__dirname, 'uploads', 'events');
+const PROFILE_PHOTO_DIRECTORY = path.join(__dirname, 'uploads', 'profiles');
 const DATABASE_URL = process.env.DATABASE_URL;
 const INITIAL_DATA = {
   users: [],
@@ -59,8 +60,16 @@ async function ensureDatabase() {
           data BYTEA NOT NULL
         )
       `);
+      await pool.query(`
+        CREATE TABLE IF NOT EXISTS campus_loop_profile_photos (
+          filename TEXT PRIMARY KEY,
+          content_type TEXT NOT NULL,
+          data BYTEA NOT NULL
+        )
+      `);
       await pool.query('ALTER TABLE campus_loop_state ENABLE ROW LEVEL SECURITY');
       await pool.query('ALTER TABLE campus_loop_event_photos ENABLE ROW LEVEL SECURITY');
+      await pool.query('ALTER TABLE campus_loop_profile_photos ENABLE ROW LEVEL SECURITY');
       await pool.query(
         'INSERT INTO campus_loop_state (id, data) VALUES (1, $1::jsonb) ON CONFLICT (id) DO NOTHING',
         [JSON.stringify(INITIAL_DATA)]
@@ -207,6 +216,64 @@ async function deletePhoto(filename) {
   }
 }
 
+async function saveProfilePhoto(filename, contentType, data) {
+  if (!/^[0-9a-f-]+\.(jpg|png|webp|gif)$/i.test(filename)) {
+    throw new Error('Invalid profile photo filename.');
+  }
+  if (pool) {
+    await ensureDatabase();
+    await pool.query(
+      'INSERT INTO campus_loop_profile_photos (filename, content_type, data) VALUES ($1, $2, $3)',
+      [filename, contentType, data]
+    );
+    return;
+  }
+
+  await fs.mkdir(PROFILE_PHOTO_DIRECTORY, { recursive: true });
+  await fs.writeFile(path.join(PROFILE_PHOTO_DIRECTORY, filename), data, { flag: 'wx' });
+}
+
+async function readProfilePhoto(filename) {
+  if (!/^[0-9a-f-]+\.(jpg|png|webp|gif)$/i.test(filename)) {
+    return null;
+  }
+  if (pool) {
+    await ensureDatabase();
+    const { rows } = await pool.query(
+      'SELECT content_type, data FROM campus_loop_profile_photos WHERE filename = $1',
+      [filename]
+    );
+    return rows[0] || null;
+  }
+
+  try {
+    const data = await fs.readFile(path.join(PROFILE_PHOTO_DIRECTORY, filename));
+    const extension = path.extname(filename).slice(1).toLowerCase();
+    const contentType = extension === 'jpg' ? 'image/jpeg' : `image/${extension}`;
+    return { content_type: contentType, data };
+  } catch (error) {
+    if (error.code === 'ENOENT') return null;
+    throw error;
+  }
+}
+
+async function deleteProfilePhoto(filename) {
+  if (!/^[0-9a-f-]+\.(jpg|png|webp|gif)$/i.test(filename)) {
+    throw new Error('Invalid profile photo filename.');
+  }
+  if (pool) {
+    await ensureDatabase();
+    await pool.query('DELETE FROM campus_loop_profile_photos WHERE filename = $1', [filename]);
+    return;
+  }
+
+  try {
+    await fs.unlink(path.join(PROFILE_PHOTO_DIRECTORY, filename));
+  } catch (error) {
+    if (error.code !== 'ENOENT') throw error;
+  }
+}
+
 async function close() {
   if (pool) await pool.end();
 }
@@ -215,4 +282,15 @@ async function initialize() {
   if (pool) await ensureDatabase();
 }
 
-module.exports = { read, update, savePhoto, readPhoto, deletePhoto, initialize, close };
+module.exports = {
+  read,
+  update,
+  savePhoto,
+  readPhoto,
+  deletePhoto,
+  saveProfilePhoto,
+  readProfilePhoto,
+  deleteProfilePhoto,
+  initialize,
+  close
+};

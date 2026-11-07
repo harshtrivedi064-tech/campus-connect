@@ -117,6 +117,14 @@ app.get('/uploads/events/:filename', asyncHandler(async (req, res, next) => {
   res.setHeader('Cache-Control', 'public, max-age=86400, immutable');
   res.type(photo.content_type).send(photo.data);
 }));
+app.get('/uploads/profiles/:filename', asyncHandler(async (req, res, next) => {
+  const photo = await db.readProfilePhoto(req.params.filename);
+  if (!photo) return next();
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('Content-Security-Policy', "default-src 'none'; sandbox");
+  res.setHeader('Cache-Control', 'public, max-age=86400, immutable');
+  res.type(photo.content_type).send(photo.data);
+}));
 
 app.get('/', (req, res) => {
   res.sendFile(path.join(rootDir, 'index.html'));

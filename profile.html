@@ -36,7 +36,16 @@
     <p id="profileStatus" class="profile-status" role="status" aria-live="polite">Loading your profile...</p>
 
     <section id="profileOverview" class="profile-overview" hidden aria-labelledby="profileName">
-      <div class="profile-avatar" id="profileAvatar" aria-hidden="true"></div>
+      <div class="profile-avatar-group">
+        <div class="profile-avatar" id="profileAvatar" aria-hidden="true"></div>
+        <form id="profilePictureForm" class="profile-picture-form">
+          <label class="profile-picture-label" for="profilePictureInput">Choose photo</label>
+          <input id="profilePictureInput" type="file" name="picture"
+            class="profile-picture-input" accept="image/jpeg,image/png,image/webp,image/gif" required>
+          <button type="submit">Upload</button>
+          <p id="profilePictureStatus" role="status" aria-live="polite"></p>
+        </form>
+      </div>
       <div class="profile-identity">
         <p class="profile-eyebrow">ACCOUNT</p>
         <h2 id="profileName"></h2>
@@ -102,7 +111,7 @@
     </section>
   </main>
 
-  <footer class="profile-footer">Campus Loop · Connect. Discover. Participate.</footer>
+  <footer class="profile-footer">Campus Loop · Connect. Discover. Participate. · Made by Harsh Trivedi</footer>
   <script src="js/profile.js"></script>
 </body>
 

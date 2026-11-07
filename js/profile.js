@@ -44,13 +44,15 @@ function renderProfile(profile) {
   document.title = `${user.name} | Campus Loop Profile`;
 
   const overview = document.getElementById('profileOverview');
-  document.getElementById('profileAvatar').textContent = user.name
+  const avatar = document.getElementById('profileAvatar');
+  const initials = user.name
     .trim()
     .split(/\s+/)
     .slice(0, 2)
     .map(part => part[0] || '')
     .join('')
     .toUpperCase();
+  setProfileAvatar(avatar, initials, user.profilePicture || user.avatarUrl);
   document.getElementById('profileName').textContent = user.name;
   document.getElementById('profileEmail').textContent = user.email;
   document.getElementById('profileRole').textContent =
@@ -173,6 +175,29 @@ function renderProfile(profile) {
   }
 }
 
+function setProfileAvatar(avatar, initials, imageUrl) {
+  avatar.replaceChildren();
+  avatar.textContent = initials;
+  if (!imageUrl) return;
+
+  let url;
+  try {
+    url = new URL(imageUrl, PROFILE_API || window.location.origin);
+  } catch {
+    return;
+  }
+  if (!['http:', 'https:'].includes(url.protocol)) return;
+
+  const image = document.createElement('img');
+  image.alt = '';
+  image.src = url.href;
+  image.addEventListener('error', () => {
+    image.remove();
+    avatar.textContent = initials;
+  }, { once: true });
+  avatar.replaceChildren(image);
+}
+
 async function loadProfile() {
   const token = localStorage.getItem('token');
   if (!token) {
@@ -197,6 +222,50 @@ async function loadProfile() {
     status.classList.add('profile-status-error');
   }
 }
+
+document.getElementById('profilePictureInput').addEventListener('change', event => {
+  const input = event.currentTarget;
+  const file = input.files[0];
+  const status = document.getElementById('profilePictureStatus');
+  status.classList.remove('profile-status-error');
+  status.textContent = file ? file.name : '';
+});
+
+document.getElementById('profilePictureForm').addEventListener('submit', async event => {
+  event.preventDefault();
+  const token = localStorage.getItem('token');
+  const input = document.getElementById('profilePictureInput');
+  const button = event.currentTarget.querySelector('button[type="submit"]');
+  const status = document.getElementById('profilePictureStatus');
+  if (!token || !input.files.length) return;
+
+  button.disabled = true;
+  status.classList.remove('profile-status-error');
+  status.textContent = 'Uploading photo...';
+  try {
+    const response = await fetch(`${PROFILE_API}/profile/picture`, {
+      method: 'PUT',
+      headers: { Authorization: 'Bearer ' + token },
+      body: new FormData(event.currentTarget)
+    });
+    if (response.status === 401) {
+      clearProfileSession();
+      return;
+    }
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(data.error || 'Could not upload your profile picture.');
+
+    const initials = document.getElementById('profileAvatar').textContent;
+    setProfileAvatar(document.getElementById('profileAvatar'), initials, data.profilePicture);
+    input.value = '';
+    status.textContent = 'Profile picture updated.';
+  } catch (error) {
+    status.textContent = error.message || 'Could not upload your profile picture. Please try again.';
+    status.classList.add('profile-status-error');
+  } finally {
+    button.disabled = false;
+  }
+});
 
 document.getElementById('profileLogout').addEventListener('click', event => {
   event.preventDefault();

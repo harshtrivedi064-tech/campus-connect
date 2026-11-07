@@ -1,10 +1,92 @@
+const crypto = require('crypto');
 const express = require('express');
+const multer = require('multer');
 const db = require('../db');
 const asyncHandler = require('../async-handler');
 const { verifyToken } = require('./auth');
 
 const router = express.Router();
+const photoTypes = {
+  'image/jpeg': { extension: 'jpg', matches: buffer =>
+    buffer.length >= 3 && buffer[0] === 0xff && buffer[1] === 0xd8 && buffer[2] === 0xff },
+  'image/png': { extension: 'png', matches: buffer =>
+    buffer.length >= 8 && buffer.subarray(0, 8).equals(Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a])) },
+  'image/webp': { extension: 'webp', matches: buffer =>
+    buffer.length >= 12 && buffer.toString('ascii', 0, 4) === 'RIFF' &&
+    buffer.toString('ascii', 8, 12) === 'WEBP' },
+  'image/gif': { extension: 'gif', matches: buffer =>
+    buffer.length >= 6 && ['GIF87a', 'GIF89a'].includes(buffer.toString('ascii', 0, 6)) }
+};
+const profilePhotoUpload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 5 * 1024 * 1024, files: 1, fields: 0 },
+  fileFilter: (req, file, callback) => {
+    if (!photoTypes[file.mimetype]) {
+      return callback(new Error('Choose a JPG, PNG, WEBP, or GIF image.'));
+    }
+    callback(null, true);
+  }
+});
 router.use(verifyToken);
+
+function parseProfilePhoto(req, res, next) {
+  profilePhotoUpload.single('picture')(req, res, error => {
+    if (!error) return next();
+    if (error instanceof multer.MulterError && error.code === 'LIMIT_FILE_SIZE') {
+      return res.status(413).json({ error: 'The photo must be 5 MB or smaller.' });
+    }
+    if (error instanceof multer.MulterError || error.message.startsWith('Choose a ')) {
+      return res.status(400).json({ error: error.message });
+    }
+    next(error);
+  });
+}
+
+router.put('/picture', parseProfilePhoto, asyncHandler(async (req, res, next) => {
+  if (!req.file) {
+    return res.status(400).json({ error: 'Choose a profile picture to upload.' });
+  }
+
+  const photoType = photoTypes[req.file.mimetype];
+  if (!photoType.matches(req.file.buffer)) {
+    return res.status(400).json({ error: 'The uploaded file is not a valid image.' });
+  }
+
+  const filename = `${crypto.randomUUID()}.${photoType.extension}`;
+  const profilePicture = `/uploads/profiles/${filename}`;
+  try {
+    await db.saveProfilePhoto(filename, req.file.mimetype, req.file.buffer);
+    const previousPicture = await db.update(data => {
+      const user = data.users.find(entry => String(entry.id) === String(req.user.id));
+      if (!user) return null;
+      const previous = user.profilePicture;
+      user.profilePicture = profilePicture;
+      return previous;
+    });
+    if (previousPicture === null) {
+      await db.deleteProfilePhoto(filename);
+      return res.status(404).json({ error: 'User not found.' });
+    }
+    if (typeof previousPicture === 'string') {
+      const previousFilename = previousPicture.match(/^\/uploads\/profiles\/([0-9a-f-]+\.(?:jpg|png|webp|gif))$/i)?.[1];
+      if (previousFilename) {
+        try {
+          await db.deleteProfilePhoto(previousFilename);
+        } catch (error) {
+          console.error('Unable to remove replaced profile photo:', error);
+        }
+      }
+    }
+    res.json({ profilePicture });
+  } catch (error) {
+    try {
+      await db.deleteProfilePhoto(filename);
+    } catch (cleanupError) {
+      console.error('Unable to remove unsaved profile photo:', cleanupError);
+    }
+    next(error);
+  }
+}));
 
 router.get('/', asyncHandler(async (req, res) => {
   const data = await db.read();
@@ -152,7 +234,13 @@ router.get('/', asyncHandler(async (req, res) => {
       name: req.user.name,
       email: req.user.email,
       role: req.user.role,
-      createdAt: req.user.createdAt || null
+      createdAt: req.user.createdAt || null,
+      ...(typeof req.user.profilePicture === 'string'
+        ? { profilePicture: req.user.profilePicture }
+        : {}),
+      ...(typeof req.user.avatarUrl === 'string'
+        ? { avatarUrl: req.user.avatarUrl }
+        : {})
     },
     stats: {
       posts: posts.length,

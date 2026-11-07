@@ -54,6 +54,31 @@ function showFeedMessage(text, isError = false) {
     message.classList.toggle('feed-message-error', isError);
 }
 
+function setFeedAvatar(avatar, name, imageUrl) {
+    const fallback = (name || 'Campus Loop').trim().charAt(0).toUpperCase() || 'C';
+    avatar.textContent = fallback;
+    if (typeof imageUrl !== 'string' || !imageUrl.trim()) return;
+
+    let url;
+    try {
+        url = new URL(imageUrl, API || window.location.origin);
+    } catch {
+        return;
+    }
+    const apiOrigin = new URL(API || window.location.origin, window.location.origin).origin;
+    if (!['http:', 'https:'].includes(url.protocol) ||
+        (url.origin !== window.location.origin && url.origin !== apiOrigin)) return;
+
+    const image = document.createElement('img');
+    image.alt = '';
+    image.src = url.href;
+    image.addEventListener('error', () => {
+        image.remove();
+        avatar.textContent = fallback;
+    }, { once: true });
+    avatar.replaceChildren(image);
+}
+
 function renderPost(post) {
     const article = document.createElement('article');
     article.className = 'feed-post';
@@ -61,8 +86,8 @@ function renderPost(post) {
     const header = document.createElement('div');
     header.className = 'feed-post-header';
 
-    addFeedText(header, 'div', 'feed-avatar',
-        (post.name || 'Campus Loop').trim().charAt(0).toUpperCase() || 'C');
+    const avatar = addFeedText(header, 'div', 'feed-avatar', '');
+    setFeedAvatar(avatar, post.name, post.profilePicture || post.avatarUrl);
 
     const identity = document.createElement('div');
     addFeedText(identity, 'strong', '', post.name || 'Campus Loop');

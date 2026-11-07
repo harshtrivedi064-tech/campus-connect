@@ -2063,6 +2063,62 @@ button:disabled {
     font-weight: 800;
 }
 
+.profile-avatar img {
+    width: 100%;
+    height: 100%;
+    border-radius: inherit;
+    object-fit: cover;
+}
+
+.profile-avatar-group {
+    display: grid;
+    justify-items: center;
+    gap: 9px;
+}
+
+.profile-picture-form {
+    display: grid;
+    justify-items: center;
+    gap: 6px;
+}
+
+.profile-picture-input {
+    width: 145px;
+    color: #aab5d0;
+    font: inherit;
+    font-size: 10px;
+}
+
+.profile-picture-form button,
+.profile-picture-label {
+    padding: 6px 10px;
+    border: 1px solid rgba(185, 165, 255, .3);
+    border-radius: 8px;
+    background: rgba(139, 92, 246, .12);
+    color: #d3c7ff;
+    font: inherit;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.profile-picture-form button:disabled {
+    cursor: wait;
+    opacity: .65;
+}
+
+.profile-picture-form p {
+    min-height: 14px;
+    margin: 0;
+    color: #aab5d0;
+    font-size: 10px;
+    text-align: center;
+}
+
+.profile-picture-form p.profile-status-error {
+    color: #fecaca;
+}
+
 .profile-identity h2 {
     margin: 0;
     color: #f5f7ff;
