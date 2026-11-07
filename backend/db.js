@@ -5,6 +5,7 @@ const { Pool } = require('pg');
 const FILE = process.env.CAMPUS_CONNECT_DATA_FILE || path.join(__dirname, 'data.json');
 const PHOTO_DIRECTORY = path.join(__dirname, 'uploads', 'events');
 const PROFILE_PHOTO_DIRECTORY = path.join(__dirname, 'uploads', 'profiles');
+const POST_ATTACHMENT_DIRECTORY = path.join(__dirname, 'uploads', 'posts');
 const DATABASE_URL = process.env.DATABASE_URL;
 const INITIAL_DATA = {
   users: [],
@@ -12,7 +13,8 @@ const INITIAL_DATA = {
   attendanceSessions: [],
   attendanceReports: [],
   events: [],
-  internships: []
+  internships: [],
+  quizzes: []
 };
 
 if (process.env.NODE_ENV === 'production' && !DATABASE_URL) {
@@ -36,11 +38,15 @@ function normalize(data) {
     post.likes = Array.isArray(post.likes) ? post.likes : [];
     post.dislikes = Array.isArray(post.dislikes) ? post.dislikes : [];
     post.comments = Array.isArray(post.comments) ? post.comments : [];
+    post.savedBy = Array.isArray(post.savedBy) ? post.savedBy : [];
+    post.reports = Array.isArray(post.reports) ? post.reports : [];
+    if (!post.category) post.category = 'General';
   });
   data.attendanceSessions = Array.isArray(data.attendanceSessions) ? data.attendanceSessions : [];
   data.attendanceReports = Array.isArray(data.attendanceReports) ? data.attendanceReports : [];
   data.events = Array.isArray(data.events) ? data.events : [];
   data.internships = Array.isArray(data.internships) ? data.internships : [];
+  data.quizzes = Array.isArray(data.quizzes) ? data.quizzes : [];
   return data;
 }
 
@@ -67,9 +73,17 @@ async function ensureDatabase() {
           data BYTEA NOT NULL
         )
       `);
+      await pool.query(`
+        CREATE TABLE IF NOT EXISTS campus_loop_post_attachments (
+          filename TEXT PRIMARY KEY,
+          content_type TEXT NOT NULL,
+          data BYTEA NOT NULL
+        )
+      `);
       await pool.query('ALTER TABLE campus_loop_state ENABLE ROW LEVEL SECURITY');
       await pool.query('ALTER TABLE campus_loop_event_photos ENABLE ROW LEVEL SECURITY');
       await pool.query('ALTER TABLE campus_loop_profile_photos ENABLE ROW LEVEL SECURITY');
+      await pool.query('ALTER TABLE campus_loop_post_attachments ENABLE ROW LEVEL SECURITY');
       await pool.query(
         'INSERT INTO campus_loop_state (id, data) VALUES (1, $1::jsonb) ON CONFLICT (id) DO NOTHING',
         [JSON.stringify(INITIAL_DATA)]
@@ -274,6 +288,67 @@ async function deleteProfilePhoto(filename) {
   }
 }
 
+function validPostAttachmentFilename(filename) {
+  return /^[0-9a-f-]+\.(jpg|png|webp|pdf)$/i.test(filename);
+}
+
+async function savePostAttachment(filename, contentType, data) {
+  if (!validPostAttachmentFilename(filename)) {
+    throw new Error('Invalid post attachment filename.');
+  }
+  if (pool) {
+    await ensureDatabase();
+    await pool.query(
+      'INSERT INTO campus_loop_post_attachments (filename, content_type, data) VALUES ($1, $2, $3)',
+      [filename, contentType, data]
+    );
+    return;
+  }
+
+  await fs.mkdir(POST_ATTACHMENT_DIRECTORY, { recursive: true });
+  await fs.writeFile(path.join(POST_ATTACHMENT_DIRECTORY, filename), data, { flag: 'wx' });
+}
+
+async function readPostAttachment(filename) {
+  if (!validPostAttachmentFilename(filename)) return null;
+  if (pool) {
+    await ensureDatabase();
+    const { rows } = await pool.query(
+      'SELECT content_type, data FROM campus_loop_post_attachments WHERE filename = $1',
+      [filename]
+    );
+    return rows[0] || null;
+  }
+
+  try {
+    const data = await fs.readFile(path.join(POST_ATTACHMENT_DIRECTORY, filename));
+    const extension = path.extname(filename).slice(1).toLowerCase();
+    const contentType = extension === 'jpg' ? 'image/jpeg'
+      : extension === 'pdf' ? 'application/pdf' : `image/${extension}`;
+    return { content_type: contentType, data };
+  } catch (error) {
+    if (error.code === 'ENOENT') return null;
+    throw error;
+  }
+}
+
+async function deletePostAttachment(filename) {
+  if (!validPostAttachmentFilename(filename)) {
+    throw new Error('Invalid post attachment filename.');
+  }
+  if (pool) {
+    await ensureDatabase();
+    await pool.query('DELETE FROM campus_loop_post_attachments WHERE filename = $1', [filename]);
+    return;
+  }
+
+  try {
+    await fs.unlink(path.join(POST_ATTACHMENT_DIRECTORY, filename));
+  } catch (error) {
+    if (error.code !== 'ENOENT') throw error;
+  }
+}
+
 async function close() {
   if (pool) await pool.end();
 }
@@ -291,6 +366,9 @@ module.exports = {
   saveProfilePhoto,
   readProfilePhoto,
   deleteProfilePhoto,
+  savePostAttachment,
+  readPostAttachment,
+  deletePostAttachment,
   initialize,
   close
 };

@@ -4,7 +4,15 @@ The Render Free web service has an ephemeral filesystem, so it cannot safely
 store application data in `backend/data.json` or event-photo files. Production
 now uses PostgreSQL when `DATABASE_URL` is set. The app creates its tables
 automatically at startup and stores user accounts, posts, attendance, events,
-and event photos in the database.
+quiz history, event photos, profile photos, and community-post attachments in
+the database.
+
+The application keeps structured records in the existing `campus_loop_state`
+JSONB row. Quiz history and new post metadata are added to that state without
+replacing existing records. Community post files use the additive
+`campus_loop_post_attachments` table in PostgreSQL (or the local
+`backend/uploads/posts` directory during development). No manual migration or
+data export is needed for this change.
 
 ## Free Supabase setup
 

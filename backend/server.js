@@ -50,7 +50,7 @@ app.use((req, res, next) => {
 });
 
 // ---------- Body parsing with a size limit ----------
-app.use(express.json({ limit: '100kb' }));
+app.use(express.json({ limit: '256kb' }));
 
 // ---------- Request logger ----------
 app.use((req, res, next) => {
@@ -99,6 +99,9 @@ const authLimiter = rateLimit({
 });
 
 // ---------- Serve the frontend and API ----------
+app.use('/backend', (req, res) => {
+  res.status(404).json({ error: 'Route not found.' });
+});
 app.use(express.static(rootDir, { index: ['index.html'] }));
 app.use('/uploads/events', express.static(path.join(__dirname, 'uploads', 'events'), {
   dotfiles: 'deny',
@@ -159,6 +162,9 @@ app.use((req, res) => {
 app.use((err, req, res, next) => {
   if (err.type === 'entity.parse.failed') {
     return res.status(400).json({ error: 'Invalid JSON in request.' });
+  }
+  if (err.type === 'entity.too.large') {
+    return res.status(413).json({ error: 'Request body is too large.' });
   }
   if (err.message === 'Not allowed by CORS') {
     return res.status(403).json({ error: 'Origin not allowed.' });

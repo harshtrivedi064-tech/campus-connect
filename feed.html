@@ -368,6 +368,7 @@
             }
         }
     </style>
+    <link rel="stylesheet" href="css/feed.css">
 </head>
 
 <body class="feed-page">
@@ -405,9 +406,21 @@
                     <p class="feed-muted">Share an update with your campus community.</p>
 
                     <form id="quickPostForm">
-                        <textarea id="quickPostContent" placeholder="What's on your mind?" maxlength="300"
-                            required></textarea>
+                        <textarea id="quickPostContent" placeholder="What's on your mind?" maxlength="2000"
+                            aria-label="Write a campus post"></textarea>
 
+                        <div class="feed-composer-options">
+                            <select id="postCategory" aria-label="Post category">
+                                <option value="General">General</option>
+                                <option value="Technology">Technology</option>
+                                <option value="Placement">Placement</option>
+                                <option value="Events">Events</option>
+                                <option value="Study Material">Study Material</option>
+                            </select>
+                            <label class="feed-attachment-label" for="postAttachment">＋ Add image or PDF</label>
+                            <input id="postAttachment" type="file" accept="image/jpeg,image/png,image/webp,application/pdf">
+                        </div>
+                        <div id="attachmentPreview" class="feed-attachment-preview" hidden></div>
                         <button class="feed-button" type="submit">Share post ↗</button>
                         <p id="quickPostMessage" class="feed-message" role="status"></p>
                     </form>
@@ -421,9 +434,24 @@
                     <div class="feed-toolbar">
                         <input id="feedSearch" type="search" placeholder="Search posts or authors"
                             aria-label="Search posts by text or author">
+                        <input id="feedAuthor" type="search" placeholder="Filter by author" aria-label="Filter by author">
+                        <select id="feedCategory" aria-label="Filter by category">
+                            <option value="">All categories</option>
+                            <option>Technology</option>
+                            <option>Placement</option>
+                            <option>Events</option>
+                            <option>Study Material</option>
+                            <option>General</option>
+                        </select>
                         <select id="feedSort" aria-label="Sort posts">
                             <option value="newest">Newest first</option>
                             <option value="oldest">Oldest first</option>
+                            <option value="trending">Trending</option>
+                            <option value="most-liked">Most liked</option>
+                        </select>
+                        <select id="feedSaved" aria-label="Show saved posts">
+                            <option value="all">All posts</option>
+                            <option value="saved">Saved posts</option>
                         </select>
                     </div>
                     <p id="feedResultCount" class="feed-muted" aria-live="polite"></p>
@@ -432,6 +460,7 @@
                             Loading campus posts...
                         </p>
                     </div>
+                    <button id="loadMorePosts" class="feed-button feed-load-more" type="button" hidden>Load more</button>
                 </div>
             </section>
 
@@ -451,6 +480,12 @@
                         Share useful study resources, project updates and college opportunities.
                         Keep posts respectful and helpful.
                     </p>
+                </div>
+
+                <div id="moderationPanel" class="feed-card" hidden>
+                    <h2>Moderation queue</h2>
+                    <p class="feed-muted">Review posts reported by the campus community.</p>
+                    <div id="moderationReports" aria-live="polite"></div>
                 </div>
             </aside>
 

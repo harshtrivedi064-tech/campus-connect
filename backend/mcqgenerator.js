@@ -143,7 +143,10 @@ function generateMCQs(rawText, count) {
             idx: i,
             question: blanked,
             options: options,
-            answer: options.indexOf(answer)
+            answer: options.indexOf(answer),
+            explanation: `The document states: "${s}"`,
+            evidence: s,
+            difficulty: 'easy'
         });
     }
 
@@ -153,7 +156,9 @@ function generateMCQs(rawText, count) {
 
     // Keep questions in the same order as the document
     questions.sort((a, b) => a.idx - b.idx);
-    return questions.map(({ question, options, answer }) => ({ question, options, answer }));
+    return questions.map(({ question, options, answer, explanation, evidence, difficulty }) => ({
+        question, options, answer, explanation, evidence, difficulty
+    }));
 }
 
 module.exports = { generateMCQs };

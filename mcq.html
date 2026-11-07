@@ -546,6 +546,7 @@
             }
         }
     </style>
+    <link rel="stylesheet" href="css/mcq.css">
 </head>
 
 <body class="mcq-page">
@@ -577,9 +578,17 @@
             <div class="mcq-panel">
                 <h2>Create your quiz</h2>
                 <p class="mcq-muted">Choose your study material and the number of questions.</p>
-                <p class="mcq-muted">When Gemini is configured, extracted text is sent to Google for question generation. Without a Gemini key, questions are created locally; topic and difficulty settings require Gemini.</p>
+                <p class="mcq-muted">Build a focused practice set or a timed examination from your study material.</p>
+                <p class="mcq-muted">PDF mode can use local text extraction without Gemini. Topic-based generation, subject/chapter focus, and selected difficulty levels require the server-side Gemini key.</p>
 
                 <form id="mcqForm">
+                    <label class="mcq-label" for="generationSource">Question source</label>
+                    <select class="mcq-select" id="generationSource">
+                        <option value="pdf">Study PDF</option>
+                        <option value="topic">Enter a topic</option>
+                    </select>
+
+                    <div id="pdfSourceFields">
                     <label class="mcq-label" for="pdfFile">Upload PDF</label>
                     <label id="uploadZone" class="mcq-upload-zone">
                         <span class="mcq-upload-icon" aria-hidden="true">↑</span>
@@ -589,6 +598,7 @@
                         <input class="mcq-file" type="file" id="pdfFile" accept=".pdf,application/pdf" required>
                     </label>
                     <button id="removeFile" class="mcq-remove-file" type="button" hidden>Remove file</button>
+                    </div>
 
                     <label class="mcq-label" for="qCount">Number of questions</label>
                     <select class="mcq-select" id="qCount">
@@ -596,24 +606,60 @@
                         <option value="10" selected>10 questions</option>
                         <option value="15">15 questions</option>
                         <option value="20">20 questions</option>
+                        <option value="30">30 questions</option>
+                        <option value="50">50 questions</option>
                     </select>
 
-                    <label class="mcq-label" for="topic">Topic or subject (optional)</label>
-                    <input class="mcq-topic-input" id="topic" type="text" maxlength="100"
-                        placeholder="e.g. data structures">
+                    <label class="mcq-label" for="subject">Subject</label>
+                    <input class="mcq-topic-input" id="subject" type="text" maxlength="100"
+                        placeholder="e.g. Computer Science">
+
+                    <label class="mcq-label" for="chapter">Chapter</label>
+                    <input class="mcq-topic-input" id="chapter" type="text" maxlength="100"
+                        placeholder="e.g. Graph algorithms">
+
+                    <label class="mcq-label" for="topic">Topic or learning objective</label>
+                    <input class="mcq-topic-input" id="topic" type="text" maxlength="120"
+                        placeholder="e.g. shortest-path algorithms">
 
                     <label class="mcq-label" for="difficulty">Difficulty</label>
                     <select class="mcq-select" id="difficulty">
-                        <option value="balanced">All levels</option>
+                        <option value="mixed">Mixed</option>
                         <option value="easy">Easy</option>
                         <option value="medium">Medium</option>
                         <option value="hard">Hard</option>
                     </select>
 
+                    <label class="mcq-label" for="examMode">Study mode</label>
+                    <select class="mcq-select" id="examMode">
+                        <option value="practice">Practice · no timer</option>
+                        <option value="exam">Exam · timed</option>
+                    </select>
+
+                    <div id="examSettings">
+                        <label class="mcq-label" for="examDuration">Exam duration</label>
+                        <select class="mcq-select" id="examDuration">
+                            <option value="10">10 minutes</option>
+                            <option value="20">20 minutes</option>
+                            <option value="30" selected>30 minutes</option>
+                            <option value="45">45 minutes</option>
+                            <option value="60">60 minutes</option>
+                            <option value="90">90 minutes</option>
+                        </select>
+                    </div>
+
+                    <label class="mcq-label" for="negativeMarking">Negative marking per incorrect answer</label>
+                    <select class="mcq-select" id="negativeMarking">
+                        <option value="0">No negative marking</option>
+                        <option value="0.25">−0.25 marks</option>
+                        <option value="0.5">−0.5 marks</option>
+                        <option value="1">−1 mark</option>
+                    </select>
+
                     <label class="mcq-label" for="quizMode">Quiz layout</label>
                     <select class="mcq-select" id="quizMode">
-                        <option value="all">All questions</option>
                         <option value="single">One question at a time</option>
+                        <option value="all">All questions</option>
                     </select>
 
                     <button class="mcq-generate" id="generateBtn" type="submit">✦ Generate MCQs</button>
@@ -636,13 +682,18 @@
                 <div class="mcq-empty" id="emptyState">
                     <div class="mcq-empty-icon">📚</div>
                     <h3>Your questions will appear here</h3>
-                    <p>Upload a PDF, choose a question count and click Generate MCQs to begin.</p>
+                    <p>Upload a PDF or enter a subject or topic, then generate a set to begin.</p>
                 </div>
 
                 <div id="quizProgress" class="mcq-progress" hidden>
                     <span id="progressLabel"></span>
                     <progress id="progressBar" value="0" max="1"></progress>
                 </div>
+                <div id="examToolbar" class="mcq-exam-toolbar" hidden>
+                    <span id="examTimer" class="mcq-timer" aria-live="polite"></span>
+                    <span id="answeredSummary" class="mcq-muted"></span>
+                </div>
+                <nav id="questionPalette" class="mcq-question-palette" aria-label="Question navigation" hidden></nav>
                 <div id="quiz"></div>
                 <div id="quizControls" class="mcq-quiz-controls" hidden>
                     <div id="stepControls" class="mcq-step-controls" hidden>
@@ -650,10 +701,19 @@
                         <span id="questionPosition" class="mcq-muted"></span>
                         <button id="nextQuestion" class="mcq-control" type="button">Next →</button>
                     </div>
+                    <button id="markForReview" class="mcq-control" type="button">☆ Mark for review</button>
                     <button id="submitQuiz" class="mcq-control primary" type="button">Submit quiz</button>
                     <button id="restartQuiz" class="mcq-control" type="button" hidden>Restart quiz</button>
                 </div>
-                <div class="mcq-score" id="scoreBar" role="status" aria-live="polite"></div>
+                <div class="mcq-score" id="scoreBar" role="status" aria-live="polite" hidden></div>
+                <section id="resultDetails" class="mcq-result-details" hidden></section>
+                <section class="mcq-history-panel">
+                    <div class="mcq-results-head">
+                        <h2>Quiz history</h2>
+                        <button id="refreshHistory" class="mcq-control" type="button">Refresh</button>
+                    </div>
+                    <div id="quizHistory" aria-live="polite"><p class="mcq-muted">Loading saved quizzes…</p></div>
+                </section>
             </div>
         </section>
 
