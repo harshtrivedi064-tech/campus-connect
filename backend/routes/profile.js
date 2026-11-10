@@ -240,7 +240,12 @@ router.get('/', asyncHandler(async (req, res) => {
         : {}),
       ...(typeof req.user.avatarUrl === 'string'
         ? { avatarUrl: req.user.avatarUrl }
-        : {})
+        : {}),
+      ...(typeof req.user.branch === 'string' ? { branch: req.user.branch } : {}),
+      ...(typeof req.user.year === 'string' || typeof req.user.year === 'number'
+        ? { year: req.user.year }
+        : {}),
+      ...(typeof req.user.program === 'string' ? { program: req.user.program } : {})
     },
     stats: {
       posts: posts.length,

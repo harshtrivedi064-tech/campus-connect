@@ -18,6 +18,7 @@
 
         <div class="nav-links">
             <a href="index.html">Home</a>
+            <a href="dashboard.html">Dashboard</a>
             <a href="feed.html">Feed</a>
             <a href="attendance.html" class="attendance-active" aria-current="page">Attendance</a>
             <a href="events.html">Events</a>
@@ -53,11 +54,14 @@
                 </div>
 
                 <form id="sessionForm" class="attendance-form">
-                    <label for="className">Class / Subject name</label>
-                    <input id="className" type="text" maxlength="80" required placeholder="e.g. Mathematics">
-
-                    <label for="classDate">Class date</label>
-                    <input id="classDate" type="date" required>
+                    <div class="attendance-field">
+                        <label for="className">Class / Subject name</label>
+                        <input id="className" type="text" maxlength="80" required placeholder="e.g. Mathematics">
+                    </div>
+                    <div class="attendance-field">
+                        <label for="classDate">Class date</label>
+                        <input id="classDate" type="date" required>
+                    </div>
 
                     <fieldset>
                         <legend>Select registered students</legend>

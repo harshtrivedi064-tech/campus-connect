@@ -8,21 +8,25 @@ function initializeHomeDashboard() {
 
     const token = localStorage.getItem('token');
     if (token && user && typeof user.name === 'string' && user.name.trim()) {
+        const isStudent = user.role === 'student';
         const greeting = document.getElementById('dashboardGreeting');
         greeting.textContent = `Welcome back, ${user.name.trim()}.`;
         greeting.hidden = false;
 
         const accountLink = document.getElementById('homeAccountLink');
-        accountLink.href = 'profile.html';
+        accountLink.href = isStudent ? 'dashboard.html' : 'profile.html';
         accountLink.replaceChildren(
-            document.createTextNode('My Profile '),
+            document.createTextNode(isStudent ? 'Dashboard ' : 'My Profile '),
             Object.assign(document.createElement('span'), { textContent: '↗' })
         );
+        const dashboardLink = document.getElementById('homeDashboardLink');
+        dashboardLink.hidden = !isStudent;
+        document.getElementById('homeToolsDashboardLink').hidden = !isStudent;
 
         const getStartedLink = document.getElementById('homeGetStarted');
-        getStartedLink.href = 'feed.html';
+        getStartedLink.href = isStudent ? 'dashboard.html' : 'feed.html';
         getStartedLink.replaceChildren(
-            document.createTextNode('Open your feed '),
+            document.createTextNode(isStudent ? 'Open dashboard ' : 'Open your feed '),
             Object.assign(document.createElement('span'), { textContent: '→' })
         );
     }

@@ -67,7 +67,7 @@ function handleGoogleLoginReturn() {
 
         localStorage.setItem('token', token);
         localStorage.setItem('currentUser', JSON.stringify(user));
-        window.location.replace('feed.html');
+        window.location.replace(user.role === 'student' ? 'dashboard.html' : 'feed.html');
     } catch (error) {
         showMessage('Could not complete Google sign-in. Please try again.', 'red');
     }
@@ -126,7 +126,7 @@ async function login() {
 
         localStorage.setItem('token', data.token);
         localStorage.setItem('currentUser', JSON.stringify(data.user));
-        window.location.href = 'feed.html';
+        window.location.href = data.user.role === 'student' ? 'dashboard.html' : 'feed.html';
     } catch (err) {
         showMessage(CONNECTION_ERROR, 'red');
     }
